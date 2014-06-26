@@ -1,8 +1,11 @@
-java/target/
-java/pom.xml.tag
-java/pom.xml.releaseBackup
-java/pom.xml.next
-java/release.properties
+# Maven
+trec-challenge/target/
+trec-challenge/pom.xml.tag
+trec-challenge/pom.xml.releaseBackup
+trec-challenge/pom.xml.next
+trec-challenge/release.properties
+
+# Latex
 paper/*.aux
 paper/*.bbl
 paper/*.blg
@@ -10,4 +13,21 @@ paper/*.dvi
 paper/*.log
 paper/*.synctex.gz
 paper/*.ps
+
+# Backup files
 *~
+
+# Eclipse
+trec-challenge/.project
+trec-challenge/.metadata
+trec-challenge/bin/**
+trec-challenge/tmp/**
+trec-challenge/tmp/**/*
+trec-challenge/*.tmp
+trec-challenge/*.bak
+trec-challenge/*.swp
+trec-challenge/*~.nib
+trec-challenge/local.properties
+trec-challenge/.classpath
+trec-challenge/.settings/
+trec-challenge/.loadpath
