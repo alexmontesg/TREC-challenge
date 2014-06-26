@@ -24,7 +24,22 @@
 
 \end{abstract}
 
-\section{Introduction}
+\section{Literature Review}
+\subsection{2012}
+
+IRIT Lab \cite{hubert2012irit} defined two modules, one for context processing and the other for preference processing. The context processor uses Google Places API to filter by geographic position. They also defined 6 sets of categories and related it to different contexts. Every context consisted on season, time and day. After this context filtering they represented user positive and negative preferences using the Vector Space Model and then compare these vectors with the resulting places of the previous step using cosine similarity.
+
+TNO and RUN \cite{sappelli2012tno} used Google Places API to collect ``touristic attractions'' in specific locations. For every user they built a positive and negative profile by extracting terms from the places they have rated using again Google Places API. Then they compared the vectors using cosine similarity. On a second run they used Kullback-Leibler divergence to rank the importance of the positive terms. Finally they re-ranked the results using Google Search to determine the category and popularity of a place.
+
+In the University of Amsterdam \cite{Koolen_contextualsuggestion} they downloaded and indexed documents from wikitravel. Then they took the positive descriptions from the user profile and used them to query their index.
+
+In the University of Delawere \cite{yang2012exploration} they extracted information of places from Yelp and Foursquare and then compute the similarity between user profiles and candidate places using category using formula (\ref{formula1}) and descriptions using F2-EXP\cite{fang2005exploration}.
+
+\begin{equation} \label{formula1}
+SIM_\mathcal{C}(e,C) = \frac{\sum_{c_{i}\in\mathcal{C}(e)}\sum_{c_{j}\in\mathcal{C}(C)}\frac{|Intersection(c_i,c_j)|}{max(|c_i|,|c_j|)}}{|\mathcal{C}(e)|\times|\mathcal{C}(C)|}
+\end{equation}
+
+CSIRO \cite{milne2012finding} used Yahoo! Placefinder API to establish bounds in some cities and then collected places within some specific categories from Google Places API and Foursquare. Then the candidates are disambiguated. User profiles were represented as a bag of words weighted using BM25. Time sensitivity was associated using Foursquare check-ins, this way categories popular at some moment of the day or some specific days were found. Then both the user-based and time-based suggestions were mixed.
 
 \bibliographystyle{abbrv}
 \bibliography{bibliography}
