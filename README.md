@@ -1,2 +1,2 @@
-TRAC-challenge
+TREC Challenge
 ==============
