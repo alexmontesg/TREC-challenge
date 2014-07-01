@@ -22,6 +22,24 @@ import org.json.JSONObject;
  * 
  */
 public class FoursquareApi {
+	public enum Section {
+		FOOD("food"), DRINKS("drinks"), COOFFE("coffee"), SHOPS("shops"), ARTS(
+				"arts"), OUTDOORS("outdoors"), SIGHTS("sights"), TRENDING(
+				"trending"), SPECIALS("specials"), NEXT_VENUES("nextVenues"), TOP_PICKS(
+				"topPicks");
+
+		private final String text;
+
+		private Section(final String text) {
+			this.text = text;
+		}
+
+		@Override
+		public String toString() {
+			return text;
+		}
+	}
+
 	private static final String CLIENT_ID = "VOIVM2QYVECRTQ3QESPLD2C1R5PW3XUUAG3EXUCIHH0R2CRK";
 	private static final String CLIENT_SECRET = "2DPTH2HFFOGTA0HVYYTVIBIZUF2PXTHJS0IJYVUUU4ENQN1F";
 	private static final String API_VERSION = "20140630";
@@ -32,32 +50,72 @@ public class FoursquareApi {
 	 * @param lat
 	 * @param lon
 	 * @param maxDistance
-	 * @return All the venues in the specified point and within the specified
-	 *         maximum distance
+	 * @return All the {@link Venue venues} in the specified point and within
+	 *         the specified maximum distance
 	 */
 	public List<Venue> getVenuesAround(double lat, double lon, int maxDistance) {
-		return getVenuesAround(lat + "," + lon, "" + maxDistance);
+		return executeQuery("ll", lat + "," + lon, "radius", "" + maxDistance);
 	}
 
 	/**
-	 * Gets {@link Venue venues} around a specific point in the earth
+	 * Gets {@link Venue venues} around a specific point in the earth in a
+	 * category
 	 * 
-	 * @param ll
-	 *            Latitude and longitude as expected by the Foursquare API
-	 * @param radius
-	 *            Max distance as expected by the Foursquare API
-	 * @return All the venues in the specified point and within the specified
-	 *         maximum distance
+	 * @param lat
+	 * @param lon
+	 * @param maxDistance
+	 * @param section
+	 *            A category of the venue
+	 * @return All the {@link Venue venues} in the specified point and within
+	 *         the specified maximum distance
 	 */
-	private List<Venue> getVenuesAround(String ll, String radius) {
+	public List<Venue> getVenuesSection(double lat, double lon,
+			int maxDistance, Section section) {
+		return executeQuery("ll", lat + "," + lon, "radius", "" + maxDistance,
+				"section", section.toString());
+	}
+
+	/**
+	 * Gets {@link Venue venues} around a specific point in the earth that match
+	 * a query
+	 * 
+	 * @param lat
+	 * @param lon
+	 * @param maxDistance
+	 * @param query
+	 *            A term to be searched against a venue's tips, category, etc.
+	 * @return All the {@link Venue venues} in the specified point and within
+	 *         the specified maximum distance
+	 */
+	public List<Venue> getVenuesQuery(double lat, double lon, int maxDistance,
+			String query) {
+		return executeQuery("ll", lat + "," + lon, "radius", "" + maxDistance,
+				"query", query);
+	}
+
+	/**
+	 * Executes a query in the Foursquare API
+	 * 
+	 * @param parameters
+	 *            The parameters of the query. The parameter name has to be
+	 *            followed by another string with the parameter value
+	 * @return All the {@link Venue venues} that match the specified query
+	 */
+	private List<Venue> executeQuery(String... parameters) {
 		List<Venue> venues = new LinkedList<Venue>();
 		Client client = ClientBuilder.newClient();
 		JSONArray venarr;
 		int offset = 0, limit = 50;
 		do {
-			WebTarget target = getBaseQuery(client, offset, limit).queryParam(
-					"ll", ll).queryParam("radius", radius);
-			venarr = executeQuery(target);
+			WebTarget target = getBaseQuery(client, offset, limit);
+			for (int i = 0; i < parameters.length - 1; i += 2) {
+				target = target.queryParam(parameters[i], parameters[i + 1]);
+			}
+			String response = target.request(MediaType.APPLICATION_JSON_TYPE)
+					.get(String.class);
+			venarr = new JSONObject(response).getJSONObject("response")
+					.getJSONArray("groups").getJSONObject(0)
+					.getJSONArray("items");
 			for (int i = 0; i < venarr.length(); i++) {
 				venues.add(new Venue(venarr.getJSONObject(i).getJSONObject(
 						"venue")));
@@ -66,23 +124,6 @@ public class FoursquareApi {
 		} while (venarr.length() == limit);
 		client.close();
 		return venues;
-	}
-
-	/**
-	 * Executes a query in the Foursquare API
-	 * 
-	 * @param target
-	 *            Query to be executed
-	 * @return A {@link JSONArray} whose elements can be converted to
-	 *         {@link Venue venues}
-	 */
-	private JSONArray executeQuery(WebTarget target) {
-		JSONArray venarr;
-		String response = target.request(MediaType.APPLICATION_JSON_TYPE).get(
-				String.class);
-		venarr = new JSONObject(response).getJSONObject("response")
-				.getJSONArray("groups").getJSONObject(0).getJSONArray("items");
-		return venarr;
 	}
 
 	/**
@@ -101,6 +142,7 @@ public class FoursquareApi {
 				.path("explore").queryParam("client_id", CLIENT_ID)
 				.queryParam("client_secret", CLIENT_SECRET)
 				.queryParam("v", API_VERSION).queryParam("limit", limit)
-				.queryParam("offset", offset);
+				.queryParam("offset", offset).queryParam("time", "any")
+				.queryParam("day", "any");
 	}
 }
