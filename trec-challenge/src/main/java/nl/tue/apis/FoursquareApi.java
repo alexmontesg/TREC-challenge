@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import nl.tue.model.Venue;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -117,8 +118,14 @@ public class FoursquareApi {
 					.getJSONArray("groups").getJSONObject(0)
 					.getJSONArray("items");
 			for (int i = 0; i < venarr.length(); i++) {
+				JSONArray tips;
+				try {
+					tips = venarr.getJSONObject(i).getJSONArray("tips");
+				} catch (JSONException e) {
+					tips = new JSONArray();
+				}
 				venues.add(new Venue(venarr.getJSONObject(i).getJSONObject(
-						"venue")));
+						"venue"), tips));
 			}
 			offset += limit;
 		} while (venarr.length() == limit);

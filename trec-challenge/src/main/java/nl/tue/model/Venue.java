@@ -7,7 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Venue {
-	private String[] categories;
+	private String[] categories, tips;
 	private String name, description, url;
 	private double score;
 	private int distance;
@@ -26,7 +26,7 @@ public class Venue {
 		this.distance = distance;
 	}
 
-	public Venue(JSONObject jsonObject) {
+	public Venue(JSONObject jsonObject, JSONArray tips) {
 		try {
 			this.score = jsonObject.getDouble("rating");
 		} catch (JSONException e) {
@@ -41,6 +41,15 @@ public class Venue {
 			}
 		} catch (JSONException e) {
 			this.categories = new String[0];
+		}
+		try {
+			this.tips = new String[tips.length()];
+			for (int j = 0; j < tips.length(); j++) {
+				this.tips[j] = tips.getJSONObject(j).getString(
+						"text");
+			}
+		} catch (JSONException e) {
+			this.tips = new String[0];
 		}
 		try {
 			this.url = jsonObject.getString("url");
@@ -63,6 +72,22 @@ public class Venue {
 		} catch (JSONException e) {
 			this.distance = Integer.MAX_VALUE;
 		}
+	}
+
+	public String[] getTips() {
+		return tips;
+	}
+
+	public void setTips(String[] tips) {
+		this.tips = tips;
+	}
+
+	public int getDistance() {
+		return distance;
+	}
+
+	public void setDistance(int distance) {
+		this.distance = distance;
 	}
 
 	public String[] getCategories() {
@@ -107,9 +132,10 @@ public class Venue {
 
 	@Override
 	public String toString() {
-		return "Venue [categories=" + Arrays.toString(categories) + ", name="
-				+ name + ", description=" + description + ", url=" + url
-				+ ", score=" + score + ", distance=" + distance + "]";
+		return "Venue [categories=" + Arrays.toString(categories) + ", tips="
+				+ Arrays.toString(tips) + ", name=" + name + ", description="
+				+ description + ", url=" + url + ", score=" + score
+				+ ", distance=" + distance + "]";
 	}
 
 }
