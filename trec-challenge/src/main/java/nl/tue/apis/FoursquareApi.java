@@ -124,8 +124,8 @@ public class FoursquareApi {
 				} catch (JSONException e) {
 					tips = new JSONArray();
 				}
-				venues.add(new Venue(venarr.getJSONObject(i).getJSONObject(
-						"venue"), tips));
+				venues.add(new Venue().buidFromFoursquare(
+						venarr.getJSONObject(i).getJSONObject("venue"), tips));
 			}
 			offset += limit;
 		} while (venarr.length() == limit);

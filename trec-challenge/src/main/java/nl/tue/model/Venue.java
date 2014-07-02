@@ -8,70 +8,74 @@ import org.json.JSONObject;
 
 public class Venue {
 	private String[] categories, tips;
-	private String name, description, url;
-	private double score;
-	private int distance;
+	private String foursquare_id, facebook_id, name, description, url;
+	private double score, lat, lng;
+	private int distance, facebook_likes;
 
-	public Venue() {
-
+	public Venue buidFromFoursquare(JSONObject jsonObject, JSONArray tips) {
+		this.score = getDouble(jsonObject, "rating");
+		this.categories = getArray(jsonObject.getJSONArray("categories"),
+				"shortName");
+		this.tips = getArray(tips, "text");
+		this.url = getString(jsonObject, "url");
+		this.name = getString(jsonObject, "name");
+		this.description = getString(jsonObject, "description");
+		this.foursquare_id = getString(jsonObject, "id");
+		this.distance = getInt(jsonObject.getJSONObject("location"), "distance");
+		this.lat = getDouble(jsonObject.getJSONObject("location"), "lat");
+		this.lng = getDouble(jsonObject.getJSONObject("location"), "lng");
+		return this;
 	}
 
-	public Venue(String[] categories, String name, String description,
-			String url, double score, int distance) {
-		this.categories = categories;
+	public Venue buidFromFacebook(JSONObject jsonObject, String name) {
 		this.name = name;
-		this.description = description;
-		this.url = url;
-		this.score = score;
-		this.distance = distance;
+		this.categories = getArray(jsonObject.getJSONArray("categories"),
+				"name");
+		this.description = getString(jsonObject, "description");
+		this.url = getString(jsonObject, "website");
+		try {
+			this.lat = getDouble(jsonObject.getJSONObject("location"),
+					"latitude");
+			this.lng = getDouble(jsonObject.getJSONObject("location"),
+					"longitude");
+		} catch (JSONException e) {
+			this.lat = 0.0;
+			this.lng = 0.0;
+		}
+		this.facebook_id = getString(jsonObject, "page_id");
+		this.facebook_likes = getInt(jsonObject, "fan_count");
+		return this;
 	}
 
-	public Venue(JSONObject jsonObject, JSONArray tips) {
-		try {
-			this.score = jsonObject.getDouble("rating");
-		} catch (JSONException e) {
-			this.score = 0.0;
-		}
-		try {
-			JSONArray cats = jsonObject.getJSONArray("categories");
-			this.categories = new String[cats.length()];
-			for (int j = 0; j < cats.length(); j++) {
-				this.categories[j] = cats.getJSONObject(j).getString(
-						"shortName");
-			}
-		} catch (JSONException e) {
-			this.categories = new String[0];
-		}
-		try {
-			this.tips = new String[tips.length()];
-			for (int j = 0; j < tips.length(); j++) {
-				this.tips[j] = tips.getJSONObject(j).getString(
-						"text");
-			}
-		} catch (JSONException e) {
-			this.tips = new String[0];
-		}
-		try {
-			this.url = jsonObject.getString("url");
-		} catch (JSONException e) {
-			this.url = "";
-		}
-		try {
-			this.name = jsonObject.getString("name");
-		} catch (JSONException e) {
-			this.name = "";
-		}
-		try {
-			this.description = jsonObject.getString("description");
-		} catch (JSONException e) {
-			this.description = "";
-		}
-		try {
-			this.distance = jsonObject.getJSONObject("location").getInt(
-					"distance");
-		} catch (JSONException e) {
-			this.distance = Integer.MAX_VALUE;
-		}
+	public double calculateDistance(double lat, double lng) {
+		int R = 6371000;
+		double dLat = deg2rad(lat - this.lat);
+		double dLng = deg2rad(lng - this.lng);
+		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+				+ Math.cos(deg2rad(this.lat)) * Math.cos(deg2rad(lat))
+				* Math.sin(dLng / 2) * Math.sin(dLng / 2);
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		return R * c;
+	}
+
+	private double deg2rad(double deg) {
+		return (deg * Math.PI / 180.0);
+	}
+
+	public double getLat() {
+		return lat;
+	}
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	public double getLng() {
+		return lng;
+	}
+
+	public void setLng(double lng) {
+		this.lng = lng;
 	}
 
 	public String[] getTips() {
@@ -130,12 +134,74 @@ public class Venue {
 		this.score = score;
 	}
 
+	public String getFoursquare_id() {
+		return foursquare_id;
+	}
+
+	public void setFoursquare_id(String foursquare_id) {
+		this.foursquare_id = foursquare_id;
+	}
+
+	public String getFacebook_id() {
+		return facebook_id;
+	}
+
+	public void setFacebook_id(String facebook_id) {
+		this.facebook_id = facebook_id;
+	}
+
+	public int getFacebook_likes() {
+		return facebook_likes;
+	}
+
+	public void setFacebook_likes(int facebook_likes) {
+		this.facebook_likes = facebook_likes;
+	}
+
+	private int getInt(JSONObject obj, String field) {
+		try {
+			return obj.getInt(field);
+		} catch (JSONException e) {
+			return Integer.MIN_VALUE;
+		}
+	}
+
+	private String getString(JSONObject obj, String field) {
+		try {
+			return obj.getString(field);
+		} catch (JSONException e) {
+			return "";
+		}
+	}
+
+	private double getDouble(JSONObject obj, String field) {
+		try {
+			return obj.getDouble(field);
+		} catch (JSONException e) {
+			return 0.0;
+		}
+	}
+
+	private String[] getArray(JSONArray arr, String field) {
+		try {
+			String[] array = new String[arr.length()];
+			for (int i = 0; i < arr.length(); i++) {
+				array[i] = arr.getJSONObject(i).getString(field);
+			}
+			return array;
+		} catch (JSONException e) {
+			return new String[0];
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "Venue [categories=" + Arrays.toString(categories) + ", tips="
-				+ Arrays.toString(tips) + ", name=" + name + ", description="
-				+ description + ", url=" + url + ", score=" + score
-				+ ", distance=" + distance + "]";
+				+ Arrays.toString(tips) + ", foursquare_id=" + foursquare_id
+				+ ", facebook_id=" + facebook_id + ", name=" + name
+				+ ", description=" + description + ", url=" + url + ", score="
+				+ score + ", lat=" + lat + ", lng=" + lng + ", distance="
+				+ distance + ", facebook_likes=" + facebook_likes + "]";
 	}
 
 }
