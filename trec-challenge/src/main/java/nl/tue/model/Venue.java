@@ -8,7 +8,8 @@ import org.json.JSONObject;
 
 public class Venue {
 	private String[] categories, tips;
-	private String foursquare_id, facebook_id, name, description, url;
+	private String foursquare_id, facebook_id, google_id, google_reference,
+			name, description, url;
 	private double score, lat, lng;
 	private int distance, facebook_likes;
 
@@ -47,7 +48,25 @@ public class Venue {
 		return this;
 	}
 
-	public double calculateDistance(double lat, double lng) {
+	public Venue buidFromGoogle(JSONObject jsonObject) {
+		this.name = getString(jsonObject, "name");
+		this.categories = getArray(jsonObject.getJSONArray("types"));
+		try {
+			this.lat = getDouble(jsonObject.getJSONObject("geometry")
+					.getJSONObject("location"), "lat");
+			this.lng = getDouble(jsonObject.getJSONObject("geometry")
+					.getJSONObject("location"), "lng");
+		} catch (JSONException e) {
+			this.lat = 0.0;
+			this.lng = 0.0;
+		}
+		this.google_id = getString(jsonObject, "id");
+		this.google_reference = getString(jsonObject, "reference");
+		this.score = getDouble(jsonObject, "rating");
+		return this;
+	}
+
+	public int calculateDistance(double lat, double lng) {
 		int R = 6371000;
 		double dLat = deg2rad(lat - this.lat);
 		double dLng = deg2rad(lng - this.lng);
@@ -55,7 +74,7 @@ public class Venue {
 				+ Math.cos(deg2rad(this.lat)) * Math.cos(deg2rad(lat))
 				* Math.sin(dLng / 2) * Math.sin(dLng / 2);
 		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		return R * c;
+		return (int)(R * c);
 	}
 
 	private double deg2rad(double deg) {
@@ -158,6 +177,22 @@ public class Venue {
 		this.facebook_likes = facebook_likes;
 	}
 
+	public String getGoogle_id() {
+		return google_id;
+	}
+
+	public void setGoogle_id(String google_id) {
+		this.google_id = google_id;
+	}
+
+	public String getGoogle_reference() {
+		return google_reference;
+	}
+
+	public void setGoogle_reference(String google_reference) {
+		this.google_reference = google_reference;
+	}
+
 	private int getInt(JSONObject obj, String field) {
 		try {
 			return obj.getInt(field);
@@ -187,6 +222,18 @@ public class Venue {
 			String[] array = new String[arr.length()];
 			for (int i = 0; i < arr.length(); i++) {
 				array[i] = arr.getJSONObject(i).getString(field);
+			}
+			return array;
+		} catch (JSONException e) {
+			return new String[0];
+		}
+	}
+	
+	private String[] getArray(JSONArray arr) {
+		try {
+			String[] array = new String[arr.length()];
+			for (int i = 0; i < arr.length(); i++) {
+				array[i] = arr.getString(i);
 			}
 			return array;
 		} catch (JSONException e) {

@@ -11,7 +11,6 @@ import javax.ws.rs.core.MediaType;
 import nl.tue.model.Venue;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -40,13 +39,13 @@ public class FacebookApi {
 	public Venue getVenueByName(String name, double lat, double lon) {
 		List<Venue> venues = executeQuery(name);
 		Venue closest = venues.get(0);
-		double min_distance = closest.calculateDistance(lat, lon);
+		closest.setDistance(closest.calculateDistance(lat, lon));
 		for (int i = 1; i < venues.size(); i++) {
 			Venue current = venues.get(i);
-			double current_distance = closest.calculateDistance(current.getLat(), current.getLng());
-			if(min_distance > current_distance) {
+			int current_distance = current.calculateDistance(current.getLat(), current.getLng());
+			if(closest.getDistance() > current_distance) {
 				closest = current;
-				min_distance = current_distance;
+				closest.setDistance(current_distance);
 			}
 		}
 		return closest;

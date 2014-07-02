@@ -5,13 +5,15 @@ import java.util.List;
 import nl.tue.apis.FacebookApi;
 import nl.tue.apis.FoursquareApi;
 import nl.tue.apis.FoursquareApi.Section;
+import nl.tue.apis.GooglePlacesApi;
 import nl.tue.model.Venue;
 
 public class App {
 	
 	public static void main(String[] args) {
-		testFacebook();
-		testFoursquare();
+		testGoogle();
+		//testFacebook();
+		//testFoursquare();
 	}
 
 	private static void testFacebook() {
@@ -24,6 +26,17 @@ public class App {
 		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
 		venues.addAll(api.getVenuesQuery(42.12922, -80.08506, 2500, "Amazing"));
 		venues.addAll(api.getVenuesSection(42.12922, -80.08506, 2500, Section.FOOD));
+		for(Venue v : venues) {
+			System.out.println(v);
+		}
+	}
+	
+	private static void testGoogle() {
+		GooglePlacesApi api = new GooglePlacesApi();
+		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
+		venues.addAll(api.getVenuesKeyword(42.12922, -80.08506, 2500, "Amazing"));
+		String[] types = {"cafe"};
+		venues.addAll(api.getVenuesType(42.12922, -80.08506, 2500, types));
 		for(Venue v : venues) {
 			System.out.println(v);
 		}
