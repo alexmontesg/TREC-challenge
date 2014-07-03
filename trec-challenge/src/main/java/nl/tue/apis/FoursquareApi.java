@@ -94,6 +94,30 @@ public class FoursquareApi {
 				"query", query);
 	}
 
+	public String[] getTips(String venueID) {
+		Client client = ClientBuilder.newClient();
+		String[] tips;
+		try {
+			JSONObject response = new JSONObject(client
+					.target("https://api.foursquare.com/v2/venues/" + venueID)
+					.path("tips").queryParam("client_id", CLIENT_ID)
+					.queryParam("client_secret", CLIENT_SECRET)
+					.queryParam("v", API_VERSION).queryParam("limit", "500")
+					.queryParam("sort", "popular")
+					.request(MediaType.APPLICATION_JSON_TYPE).get(String.class))
+					.getJSONObject("response").getJSONObject("tips");
+			JSONArray tipArray = response.getJSONArray("items");
+			tips = new String[tipArray.length()];
+			for (int i = 0; i < tipArray.length(); i++) {
+				tips[i] = tipArray.getJSONObject(i).getString("text");
+			}
+		} catch (JSONException e) {
+			return new String[0];
+		}
+		client.close();
+		return tips;
+	}
+
 	/**
 	 * Executes a query in the Foursquare API
 	 * 
