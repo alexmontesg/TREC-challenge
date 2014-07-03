@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Venue {
+	
 	private String[] categories, tips;
 	private String foursquare_id, facebook_id, google_id, google_reference,
 			yelp_id, name, description, url;
