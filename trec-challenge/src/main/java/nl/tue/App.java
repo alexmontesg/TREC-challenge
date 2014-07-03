@@ -23,12 +23,12 @@ public class App {
 	}
 
 	private static void testFacebook() throws InterruptedException {
-		FacebookApi api = new FacebookApi();
+		FacebookApi api = FacebookApi.getInstance();
 		System.out.println(api.getVenueByName("Dominick's 24 Hour Eatery", 42.124313901938, -80.079190272366));
 	}
 
 	private static void testFoursquare() throws InterruptedException {
-		FoursquareApi api = new FoursquareApi();
+		FoursquareApi api = FoursquareApi.getInstance();
 		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
 		venues.addAll(api.getVenuesQuery(42.12922, -80.08506, 2500, "Amazing"));
 		venues.addAll(api.getVenuesSection(42.12922, -80.08506, 2500, Section.FOOD));
@@ -39,7 +39,7 @@ public class App {
 	}
 	
 	private static void testGoogle() throws InterruptedException {
-		GooglePlacesApi api = new GooglePlacesApi();
+		GooglePlacesApi api = GooglePlacesApi.getInstance();
 		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
 		venues.addAll(api.getVenuesKeyword(42.12922, -80.08506, 2500, "Amazing"));
 		String[] types = {"cafe"};
@@ -50,7 +50,7 @@ public class App {
 	}
 	
 	private static void testYelp() throws InterruptedException {
-		YelpApi api = new YelpApi();
+		YelpApi api = YelpApi.getInstance();
 		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
 		venues.addAll(api.getVenuesKeyword(42.12922, -80.08506, 2500, "Amazing"));
 		String[] types = {"cafes"};

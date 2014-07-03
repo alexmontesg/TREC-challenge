@@ -28,6 +28,18 @@ public class GooglePlacesApi {
 	private static final int MAX_QUERIES = 20; // 20 * MAX_QUERIES results
 	private static final int MAX_REQ_DAY = 1000;
 	private static int requests = 0;
+	private static GooglePlacesApi instance = null;
+
+	private GooglePlacesApi() {
+
+	}
+
+	public static GooglePlacesApi getInstance() {
+		if (instance == null) {
+			instance = new GooglePlacesApi();
+		}
+		return instance;
+	}
 
 	/**
 	 * Gets {@link Venue venues} around a specific point in the earth

@@ -35,6 +35,18 @@ public class YelpApi {
 	private static OAuthService SERVICE = null;
 	private static final int MAX_REQ_DAY = 10000;
 	private static int requests = 0;
+	private static YelpApi instance = null;
+	
+	private YelpApi() {
+		
+	}
+	
+	public static YelpApi getInstance() {
+		if(instance == null) {
+			instance = new YelpApi();
+		}
+		return instance;
+	}
 
 	/**
 	 * Gets {@link Venue venues} around a specific point in the earth

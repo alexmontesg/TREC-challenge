@@ -28,6 +28,18 @@ public class FacebookApi {
 	private static String ACCESS_TOKEN = "";
 	private static final int MAX_REQ_10_MIN = 300;
 	private static int requests = 0;
+	private static FacebookApi instance = null;
+
+	private FacebookApi() {
+
+	}
+
+	public static FacebookApi getInstance() {
+		if (instance == null) {
+			instance = new FacebookApi();
+		}
+		return instance;
+	}
 
 	/**
 	 * Gets the closest {@link Venue} to the given point with the specified name

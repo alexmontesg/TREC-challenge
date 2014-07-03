@@ -46,6 +46,18 @@ public class FoursquareApi {
 	private static final String API_VERSION = "20140630";
 	private static final int MAX_REQ_HOUR = 5000;
 	private static int requests = 0;
+	private static FoursquareApi instance = null;
+
+	private FoursquareApi() {
+
+	}
+
+	public static FoursquareApi getInstance() {
+		if (instance == null) {
+			instance = new FoursquareApi();
+		}
+		return instance;
+	}
 
 	/**
 	 * Gets {@link Venue venues} around a specific point in the earth
