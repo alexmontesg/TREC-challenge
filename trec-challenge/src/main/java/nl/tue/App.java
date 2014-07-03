@@ -6,14 +6,16 @@ import nl.tue.apis.FacebookApi;
 import nl.tue.apis.FoursquareApi;
 import nl.tue.apis.FoursquareApi.Section;
 import nl.tue.apis.GooglePlacesApi;
+import nl.tue.apis.YelpApi;
 import nl.tue.model.Venue;
 
 public class App {
 	
 	public static void main(String[] args) {
+		testYelp();
 		testGoogle();
-		//testFacebook();
-		//testFoursquare();
+		testFacebook();
+		testFoursquare();
 	}
 
 	private static void testFacebook() {
@@ -36,6 +38,17 @@ public class App {
 		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
 		venues.addAll(api.getVenuesKeyword(42.12922, -80.08506, 2500, "Amazing"));
 		String[] types = {"cafe"};
+		venues.addAll(api.getVenuesType(42.12922, -80.08506, 2500, types));
+		for(Venue v : venues) {
+			System.out.println(v);
+		}
+	}
+	
+	private static void testYelp() {
+		YelpApi api = new YelpApi();
+		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
+		venues.addAll(api.getVenuesKeyword(42.12922, -80.08506, 2500, "Amazing"));
+		String[] types = {"cafes"};
 		venues.addAll(api.getVenuesType(42.12922, -80.08506, 2500, types));
 		for(Venue v : venues) {
 			System.out.println(v);

@@ -9,7 +9,7 @@ import org.json.JSONObject;
 public class Venue {
 	private String[] categories, tips;
 	private String foursquare_id, facebook_id, google_id, google_reference,
-			name, description, url;
+			yelp_id, name, description, url;
 	private double score, lat, lng;
 	private int distance, facebook_likes;
 
@@ -50,7 +50,7 @@ public class Venue {
 
 	public Venue buidFromGoogle(JSONObject jsonObject) {
 		this.name = getString(jsonObject, "name");
-		this.categories = getArray(jsonObject.getJSONArray("types"));
+		this.categories = getArray(jsonObject.getJSONArray("types"), false);
 		try {
 			this.lat = getDouble(jsonObject.getJSONObject("geometry")
 					.getJSONObject("location"), "lat");
@@ -66,6 +66,31 @@ public class Venue {
 		return this;
 	}
 
+	public Venue buidFromYelp(JSONObject jsonObject) {
+		this.name = getString(jsonObject, "name");
+		this.distance = (int) getDouble(jsonObject, "distance");
+		try {
+			this.categories = getArray(jsonObject.getJSONArray("categories"),
+					true);
+		} catch (JSONException e) {
+			this.categories = new String[0];
+		}
+		try {
+			this.lat = getDouble(jsonObject.getJSONObject("location")
+					.getJSONObject("coordinate"), "latitude");
+			this.lng = getDouble(jsonObject.getJSONObject("location")
+					.getJSONObject("coordinate"), "longitude");
+		} catch (JSONException e) {
+			this.lat = 0.0;
+			this.lng = 0.0;
+		}
+		this.yelp_id = getString(jsonObject, "id");
+		this.score = getDouble(jsonObject, "rating");
+		this.description = getString(jsonObject, "snippet_text");
+		this.url = getString(jsonObject, "url");
+		return this;
+	}
+
 	public int calculateDistance(double lat, double lng) {
 		int R = 6371000;
 		double dLat = deg2rad(lat - this.lat);
@@ -74,7 +99,7 @@ public class Venue {
 				+ Math.cos(deg2rad(this.lat)) * Math.cos(deg2rad(lat))
 				* Math.sin(dLng / 2) * Math.sin(dLng / 2);
 		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		return (int)(R * c);
+		return (int) (R * c);
 	}
 
 	private double deg2rad(double deg) {
@@ -193,6 +218,14 @@ public class Venue {
 		this.google_reference = google_reference;
 	}
 
+	public String getYelp_id() {
+		return yelp_id;
+	}
+
+	public void setYelp_id(String yelp_id) {
+		this.yelp_id = yelp_id;
+	}
+
 	private int getInt(JSONObject obj, String field) {
 		try {
 			return obj.getInt(field);
@@ -228,12 +261,16 @@ public class Venue {
 			return new String[0];
 		}
 	}
-	
-	private String[] getArray(JSONArray arr) {
+
+	private String[] getArray(JSONArray arr, boolean yelpArray) {
 		try {
 			String[] array = new String[arr.length()];
 			for (int i = 0; i < arr.length(); i++) {
-				array[i] = arr.getString(i);
+				if (!yelpArray) {
+					array[i] = arr.getString(i);
+				} else {
+					array[i] = arr.getJSONArray(i).getString(0);
+				}
 			}
 			return array;
 		} catch (JSONException e) {
@@ -245,10 +282,12 @@ public class Venue {
 	public String toString() {
 		return "Venue [categories=" + Arrays.toString(categories) + ", tips="
 				+ Arrays.toString(tips) + ", foursquare_id=" + foursquare_id
-				+ ", facebook_id=" + facebook_id + ", name=" + name
-				+ ", description=" + description + ", url=" + url + ", score="
-				+ score + ", lat=" + lat + ", lng=" + lng + ", distance="
-				+ distance + ", facebook_likes=" + facebook_likes + "]";
+				+ ", facebook_id=" + facebook_id + ", google_id=" + google_id
+				+ ", google_reference=" + google_reference + ", yelp_id="
+				+ yelp_id + ", name=" + name + ", description=" + description
+				+ ", url=" + url + ", score=" + score + ", lat=" + lat
+				+ ", lng=" + lng + ", distance=" + distance
+				+ ", facebook_likes=" + facebook_likes + "]";
 	}
 
 }
