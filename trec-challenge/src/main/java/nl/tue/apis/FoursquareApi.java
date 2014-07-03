@@ -44,6 +44,8 @@ public class FoursquareApi {
 	private static final String CLIENT_ID = "VOIVM2QYVECRTQ3QESPLD2C1R5PW3XUUAG3EXUCIHH0R2CRK";
 	private static final String CLIENT_SECRET = "2DPTH2HFFOGTA0HVYYTVIBIZUF2PXTHJS0IJYVUUU4ENQN1F";
 	private static final String API_VERSION = "20140630";
+	private static final int MAX_REQ_HOUR = 5000;
+	private static int requests = 0;
 
 	/**
 	 * Gets {@link Venue venues} around a specific point in the earth
@@ -53,8 +55,9 @@ public class FoursquareApi {
 	 * @param maxDistance
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException 
 	 */
-	public List<Venue> getVenuesAround(double lat, double lon, int maxDistance) {
+	public List<Venue> getVenuesAround(double lat, double lon, int maxDistance) throws InterruptedException {
 		return executeQuery("ll", lat + "," + lon, "radius", "" + maxDistance);
 	}
 
@@ -69,9 +72,10 @@ public class FoursquareApi {
 	 *            A category of the venue
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException 
 	 */
 	public List<Venue> getVenuesSection(double lat, double lon,
-			int maxDistance, Section section) {
+			int maxDistance, Section section) throws InterruptedException {
 		return executeQuery("ll", lat + "," + lon, "radius", "" + maxDistance,
 				"section", section.toString());
 	}
@@ -87,14 +91,20 @@ public class FoursquareApi {
 	 *            A term to be searched against a venue's tips, category, etc.
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException 
 	 */
 	public List<Venue> getVenuesQuery(double lat, double lon, int maxDistance,
-			String query) {
+			String query) throws InterruptedException {
 		return executeQuery("ll", lat + "," + lon, "radius", "" + maxDistance,
 				"query", query);
 	}
 
-	public String[] getTips(String venueID) {
+	public String[] getTips(String venueID) throws InterruptedException {
+		requests++;
+		if(requests >= MAX_REQ_HOUR) {
+			Thread.sleep(3600000);
+			requests = 1;
+		}
 		Client client = ClientBuilder.newClient();
 		String[] tips;
 		try {
@@ -125,13 +135,19 @@ public class FoursquareApi {
 	 *            The parameters of the query. The parameter name has to be
 	 *            followed by another string with the parameter value
 	 * @return All the {@link Venue venues} that match the specified query
+	 * @throws InterruptedException 
 	 */
-	private List<Venue> executeQuery(String... parameters) {
+	private List<Venue> executeQuery(String... parameters) throws InterruptedException {
 		List<Venue> venues = new LinkedList<Venue>();
 		Client client = ClientBuilder.newClient();
 		JSONArray venarr;
 		int offset = 0, limit = 50;
 		do {
+			requests++;
+			if(requests >= MAX_REQ_HOUR) {
+				Thread.sleep(3600000);
+				requests = 1;
+			}
 			WebTarget target = getBaseQuery(client, offset, limit);
 			for (int i = 0; i < parameters.length - 1; i += 2) {
 				target = target.queryParam(parameters[i], parameters[i + 1]);

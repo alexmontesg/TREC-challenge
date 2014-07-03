@@ -26,6 +26,8 @@ public class FacebookApi {
 	private static final String APP_ID = "424680681007882";
 	private static final String APP_SECRET = "fa82e06599fa009d890dd673002e6995";
 	private static String ACCESS_TOKEN = "";
+	private static final int MAX_REQ_10_MIN = 300;
+	private static int requests = 0;
 
 	/**
 	 * Gets the closest {@link Venue} to the given point with the specified name
@@ -35,15 +37,24 @@ public class FacebookApi {
 	 * @param lon
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException
 	 */
-	public Venue getVenueByName(String name, double lat, double lon) {
+	public Venue getVenueByName(String name, double lat, double lon)
+			throws InterruptedException {
+		requests++;
+		if (requests >= MAX_REQ_10_MIN) {
+			Thread.sleep(600000);
+			requests = 1;
+			ACCESS_TOKEN = "";
+		}
 		List<Venue> venues = executeQuery(name);
 		Venue closest = venues.get(0);
 		closest.setDistance(closest.calculateDistance(lat, lon));
 		for (int i = 1; i < venues.size(); i++) {
 			Venue current = venues.get(i);
-			int current_distance = current.calculateDistance(current.getLat(), current.getLng());
-			if(closest.getDistance() > current_distance) {
+			int current_distance = current.calculateDistance(current.getLat(),
+					current.getLng());
+			if (closest.getDistance() > current_distance) {
 				closest = current;
 				closest.setDistance(current_distance);
 			}
@@ -79,6 +90,7 @@ public class FacebookApi {
 	 */
 	private WebTarget getBaseQuery(Client client) {
 		if (ACCESS_TOKEN.isEmpty()) {
+			requests++;
 			Client access_client = ClientBuilder.newClient();
 			ACCESS_TOKEN = access_client
 					.target("https://graph.facebook.com/oauth")

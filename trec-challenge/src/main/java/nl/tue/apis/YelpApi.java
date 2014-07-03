@@ -33,6 +33,8 @@ public class YelpApi {
 	private static final String TOKEN_SECRET = "Cz-nE1-jREl0G7u9S6SfPr5IQnU";
 	private static Token ACCESS_TOKEN = null;
 	private static OAuthService SERVICE = null;
+	private static final int MAX_REQ_DAY = 10000;
+	private static int requests = 0;
 
 	/**
 	 * Gets {@link Venue venues} around a specific point in the earth
@@ -42,8 +44,9 @@ public class YelpApi {
 	 * @param maxDistance
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException 
 	 */
-	public List<Venue> getVenuesAround(double lat, double lon, int maxDistance) {
+	public List<Venue> getVenuesAround(double lat, double lon, int maxDistance) throws InterruptedException {
 		List<Venue> venues = executeQuery("ll", lat + "," + lon,
 				"radius_filter", "" + maxDistance);
 		for (Venue v : venues) {
@@ -66,9 +69,10 @@ public class YelpApi {
 	 *            >the documentation</a>
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException 
 	 */
 	public List<Venue> getVenuesType(double lat, double lon, int maxDistance,
-			String[] types) {
+			String[] types) throws InterruptedException {
 		StringBuilder typeString = new StringBuilder();
 		boolean first = true;
 		for (int i = 0; i < types.length; i++) {
@@ -99,9 +103,10 @@ public class YelpApi {
 	 *            A term to be searched against a venue's tips, category, etc.
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException 
 	 */
 	public List<Venue> getVenuesKeyword(double lat, double lon,
-			int maxDistance, String term) {
+			int maxDistance, String term) throws InterruptedException {
 		List<Venue> venues = executeQuery("ll", lat + "," + lon,
 				"radius_filter", "" + maxDistance, "term", term);
 		for (Venue v : venues) {
@@ -117,13 +122,21 @@ public class YelpApi {
 	 *            The parameters of the query. The parameter name has to be
 	 *            followed by another string with the parameter value
 	 * @return All the {@link Venue venues} that match the specified query
+	 * @throws InterruptedException 
 	 */
-	private List<Venue> executeQuery(String... parameters) {
+	private List<Venue> executeQuery(String... parameters) throws InterruptedException {
 		List<Venue> venues = new LinkedList<Venue>();
 		Client client = ClientBuilder.newClient();
 		JSONArray venarr;
 		int offset = 0, limit = 20;
 		do {
+			requests++;
+			if (requests >= MAX_REQ_DAY) {
+				Thread.sleep(86400000);
+				requests = 1;
+				SERVICE = null;
+				ACCESS_TOKEN = null;
+			}
 			OAuthRequest request = getBaseQuery(offset, limit);
 			for (int i = 0; i < parameters.length - 1; i += 2) {
 				request.addQuerystringParameter(parameters[i],
@@ -153,6 +166,7 @@ public class YelpApi {
 	 */
 	private OAuthRequest getBaseQuery(int offset, int limit) {
 		if (ACCESS_TOKEN == null) {
+			requests++;
 			SERVICE = new ServiceBuilder().provider(TwoStepOAuth.class)
 					.apiKey(CONSUMER_KEY).apiSecret(CONSUMER_SECRET).build();
 			ACCESS_TOKEN = new Token(TOKEN, TOKEN_SECRET);

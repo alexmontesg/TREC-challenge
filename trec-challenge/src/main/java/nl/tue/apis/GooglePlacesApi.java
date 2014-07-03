@@ -26,6 +26,8 @@ public class GooglePlacesApi {
 
 	private static final String API_KEY = "AIzaSyBeukipNQY4LtY84N4EL_VQLnYYZKi97bs";
 	private static final int MAX_QUERIES = 20; // 20 * MAX_QUERIES results
+	private static final int MAX_REQ_DAY = 1000;
+	private static int requests = 0;
 
 	/**
 	 * Gets {@link Venue venues} around a specific point in the earth
@@ -35,8 +37,10 @@ public class GooglePlacesApi {
 	 * @param maxDistance
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException
 	 */
-	public List<Venue> getVenuesAround(double lat, double lon, int maxDistance) {
+	public List<Venue> getVenuesAround(double lat, double lon, int maxDistance)
+			throws InterruptedException {
 		List<Venue> venues = executeQuery("location", lat + "," + lon,
 				"radius", "" + maxDistance);
 		for (Venue v : venues) {
@@ -59,9 +63,10 @@ public class GooglePlacesApi {
 	 *            >the documentation</a>
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException
 	 */
 	public List<Venue> getVenuesType(double lat, double lon, int maxDistance,
-			String[] types) {
+			String[] types) throws InterruptedException {
 		StringBuilder typeString = new StringBuilder();
 		boolean first = true;
 		for (int i = 0; i < types.length; i++) {
@@ -91,9 +96,10 @@ public class GooglePlacesApi {
 	 *            A term to be searched against a venue's tips, category, etc.
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
+	 * @throws InterruptedException
 	 */
 	public List<Venue> getVenuesKeyword(double lat, double lon,
-			int maxDistance, String keyword) {
+			int maxDistance, String keyword) throws InterruptedException {
 		List<Venue> venues = executeQuery("location", lat + "," + lon,
 				"radius", "" + maxDistance, "keyword", keyword);
 		for (Venue v : venues) {
@@ -109,14 +115,21 @@ public class GooglePlacesApi {
 	 *            The parameters of the query. The parameter name has to be
 	 *            followed by another string with the parameter value
 	 * @return All the {@link Venue venues} that match the specified query
+	 * @throws InterruptedException
 	 */
-	private List<Venue> executeQuery(String... parameters) {
+	private List<Venue> executeQuery(String... parameters)
+			throws InterruptedException {
 		List<Venue> venues = new LinkedList<Venue>();
 		Client client = ClientBuilder.newClient();
 		JSONArray venarr;
 		String nextPageToken = "";
 		int queries = 0;
 		do {
+			requests++;
+			if (requests >= MAX_REQ_DAY) {
+				Thread.sleep(86400000);
+				requests = 1;
+			}
 			WebTarget target = getBaseQuery(client);
 			for (int i = 0; i < parameters.length - 1; i += 2) {
 				target = target.queryParam(parameters[i], parameters[i + 1]);
@@ -137,6 +150,7 @@ public class GooglePlacesApi {
 				nextPageToken = "";
 			}
 			queries++;
+			Thread.sleep(1000); // Next page can take some time to be ready
 		} while (nextPageToken != null && !nextPageToken.isEmpty()
 				&& !nextPageToken.equalsIgnoreCase("null")
 				&& queries < MAX_QUERIES);

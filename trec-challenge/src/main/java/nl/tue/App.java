@@ -12,18 +12,22 @@ import nl.tue.model.Venue;
 public class App {
 	
 	public static void main(String[] args) {
-		testYelp();
-		testGoogle();
-		testFacebook();
-		testFoursquare();
+		try {
+			testYelp();
+			testGoogle();
+			testFacebook();
+			testFoursquare();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
-	private static void testFacebook() {
+	private static void testFacebook() throws InterruptedException {
 		FacebookApi api = new FacebookApi();
 		System.out.println(api.getVenueByName("Dominick's 24 Hour Eatery", 42.124313901938, -80.079190272366));
 	}
 
-	private static void testFoursquare() {
+	private static void testFoursquare() throws InterruptedException {
 		FoursquareApi api = new FoursquareApi();
 		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
 		venues.addAll(api.getVenuesQuery(42.12922, -80.08506, 2500, "Amazing"));
@@ -31,9 +35,10 @@ public class App {
 		for(Venue v : venues) {
 			System.out.println(v);
 		}
+		System.out.println(api.getTips(venues.get(0).getFoursquare_id()));
 	}
 	
-	private static void testGoogle() {
+	private static void testGoogle() throws InterruptedException {
 		GooglePlacesApi api = new GooglePlacesApi();
 		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
 		venues.addAll(api.getVenuesKeyword(42.12922, -80.08506, 2500, "Amazing"));
@@ -44,7 +49,7 @@ public class App {
 		}
 	}
 	
-	private static void testYelp() {
+	private static void testYelp() throws InterruptedException {
 		YelpApi api = new YelpApi();
 		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
 		venues.addAll(api.getVenuesKeyword(42.12922, -80.08506, 2500, "Amazing"));
