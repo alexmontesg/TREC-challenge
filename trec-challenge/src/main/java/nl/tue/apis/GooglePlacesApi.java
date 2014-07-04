@@ -25,8 +25,8 @@ import org.json.JSONObject;
 public class GooglePlacesApi {
 
 	private static final String API_KEY = "AIzaSyBeukipNQY4LtY84N4EL_VQLnYYZKi97bs";
-	private static final int MAX_QUERIES = 20; // 20 * MAX_QUERIES results
-	private static final int MAX_REQ_DAY = 1000;
+	private static final int MAX_QUERIES = 25; // 20 * MAX_QUERIES results
+	private static final int MAX_REQ_DAY = 950;
 	private static int requests = 0;
 	private static GooglePlacesApi instance = null;
 
@@ -140,7 +140,7 @@ public class GooglePlacesApi {
 			requests++;
 			if (requests >= MAX_REQ_DAY) {
 				System.out.println("GOOGLE: Limit reached, waiting 1 day");
-				Thread.sleep(86400000);
+				Thread.sleep(86025000);
 				requests = 1;
 			}
 			WebTarget target = getBaseQuery(client);
@@ -163,7 +163,7 @@ public class GooglePlacesApi {
 				nextPageToken = "";
 			}
 			queries++;
-			Thread.sleep(1000); // Next page can take some time to be ready
+			Thread.sleep(750); // Next page can take some time to be ready
 		} while (nextPageToken != null && !nextPageToken.isEmpty()
 				&& !nextPageToken.equalsIgnoreCase("null")
 				&& queries < MAX_QUERIES);
