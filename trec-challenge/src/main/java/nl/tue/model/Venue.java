@@ -9,10 +9,10 @@ import org.json.JSONObject;
 public class Venue {
 	
 	private String[] categories, tips;
-	private String foursquare_id, facebook_id, google_id, google_reference,
-			yelp_id, name, description, url;
-	private double score, lat, lng;
-	private int distance, facebook_likes;
+	private String foursquare_id = "", facebook_id = "", google_id = "", google_reference = "",
+			yelp_id = "", name = "", description = "", url = "";
+	private double score = 0.0, lat = 0.0, lng = 0.0;
+	private int distance = -1, facebook_likes = 0;
 
 	public Venue buidFromFoursquare(JSONObject jsonObject, JSONArray tips) {
 		this.score = getDouble(jsonObject, "rating");

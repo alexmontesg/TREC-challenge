@@ -1,5 +1,6 @@
 package nl.tue.apis;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import nl.tue.model.Venue;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -60,6 +62,9 @@ public class FacebookApi {
 			ACCESS_TOKEN = "";
 		}
 		List<Venue> venues = executeQuery(name);
+		if(venues.size() == 0) {
+			return null;
+		}
 		Venue closest = venues.get(0);
 		closest.setDistance(closest.calculateDistance(lat, lon));
 		for (int i = 1; i < venues.size(); i++) {
@@ -71,7 +76,7 @@ public class FacebookApi {
 				closest.setDistance(current_distance);
 			}
 		}
-		return closest;
+		return closest.getDistance() < 500 ? closest : null;
 	}
 
 	private List<Venue> executeQuery(String name) {
@@ -84,10 +89,14 @@ public class FacebookApi {
 		target = target.queryParam("q", query);
 		String response = target.request(MediaType.APPLICATION_JSON_TYPE).get(
 				String.class);
-		venarr = new JSONObject(response).getJSONArray("data");
-		for (int i = 0; i < venarr.length(); i++) {
-			venues.add(new Venue().buidFromFacebook(venarr.getJSONObject(i),
-					name));
+		try{
+			venarr = new JSONObject(response).getJSONArray("data");
+			for (int i = 0; i < venarr.length(); i++) {
+				venues.add(new Venue().buidFromFacebook(venarr.getJSONObject(i),
+						name));
+			}
+		} catch (JSONException e) {
+			return Collections.emptyList();
 		}
 		client.close();
 		return venues;

@@ -114,6 +114,7 @@ public class FoursquareApi {
 	public String[] getTips(String venueID) throws InterruptedException {
 		requests++;
 		if(requests >= MAX_REQ_HOUR) {
+			System.out.println("FOURSQUARE: Limit reached, waiting 1 hour");
 			Thread.sleep(3600000);
 			requests = 1;
 		}
@@ -157,6 +158,7 @@ public class FoursquareApi {
 		do {
 			requests++;
 			if(requests >= MAX_REQ_HOUR) {
+				System.out.println("FOURSQUARE: Limit reached, waiting 1 hour");
 				Thread.sleep(3600000);
 				requests = 1;
 			}

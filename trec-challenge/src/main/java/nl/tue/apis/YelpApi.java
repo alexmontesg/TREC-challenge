@@ -10,6 +10,7 @@ import nl.tue.model.Venue;
 import nl.tue.util.TwoStepOAuth;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.model.OAuthRequest;
@@ -144,6 +145,7 @@ public class YelpApi {
 		do {
 			requests++;
 			if (requests >= MAX_REQ_DAY) {
+				System.out.println("YELP: Limit reached, waiting 1 day");
 				Thread.sleep(86400000);
 				requests = 1;
 				SERVICE = null;
@@ -156,7 +158,11 @@ public class YelpApi {
 			}
 			SERVICE.signRequest(ACCESS_TOKEN, request);
 			String response = request.send().getBody();
-			venarr = new JSONObject(response).getJSONArray("businesses");
+			try {
+				venarr = new JSONObject(response).getJSONArray("businesses");
+			} catch(JSONException e) {
+				venarr = new JSONArray();
+			}
 			for (int i = 0; i < venarr.length(); i++) {
 				venues.add(new Venue().buidFromYelp(venarr.getJSONObject(i)));
 			}

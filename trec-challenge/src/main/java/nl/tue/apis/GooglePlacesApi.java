@@ -139,6 +139,7 @@ public class GooglePlacesApi {
 		do {
 			requests++;
 			if (requests >= MAX_REQ_DAY) {
+				System.out.println("GOOGLE: Limit reached, waiting 1 day");
 				Thread.sleep(86400000);
 				requests = 1;
 			}
