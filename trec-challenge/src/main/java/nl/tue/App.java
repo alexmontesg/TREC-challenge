@@ -33,12 +33,12 @@ public class App {
 		google.start();
 		YelpThread yelp = new YelpThread(locations, yelpVenues);
 		yelp.start();
-		google.join();
-		allVenues.addAll(googleVenues);
-		yelp.join();
-		allVenues.addAll(yelpVenues);
 		foursquare.join();
 		allVenues.addAll(foursquareVenues);
+		yelp.join();
+		allVenues.addAll(yelpVenues);
+		google.join();
+		allVenues.addAll(googleVenues);
 		int i = 1;
 		for (Venue v : allVenues) {
 			insertVenue(str, i, v);

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -109,6 +110,8 @@ public class FacebookApi {
 				}
 			} catch (ServerErrorException e) {
 				incRequest();
+			} catch (BadRequestException e) {
+				break;
 			}
 		}
 		return venues;
