@@ -3,6 +3,7 @@ package nl.tue.apis;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -137,12 +138,7 @@ public class GooglePlacesApi {
 		String nextPageToken = "";
 		int queries = 0;
 		do {
-			requests++;
-			if (requests >= MAX_REQ_DAY) {
-				System.out.println("GOOGLE: Limit reached, waiting 1 day");
-				Thread.sleep(86025000);
-				requests = 1;
-			}
+			incRequest();
 			WebTarget target = getBaseQuery(client);
 			for (int i = 0; i < parameters.length - 1; i += 2) {
 				target = target.queryParam(parameters[i], parameters[i + 1]);
@@ -150,25 +146,43 @@ public class GooglePlacesApi {
 			if (!nextPageToken.isEmpty()) {
 				target.queryParam("pagetoken", nextPageToken);
 			}
-			String response = target.request(MediaType.APPLICATION_JSON_TYPE)
-					.get(String.class);
-			JSONObject jsonResponse = new JSONObject(response);
-			venarr = jsonResponse.getJSONArray("results");
-			for (int i = 0; i < venarr.length(); i++) {
-				venues.add(new Venue().buidFromGoogle(venarr.getJSONObject(i)));
+			int old_queries = queries;
+			for (int tries = 0; tries < 3 && old_queries == queries; tries++) {
+				try {
+					String response = target.request(
+							MediaType.APPLICATION_JSON_TYPE).get(String.class);
+					JSONObject jsonResponse = new JSONObject(response);
+					venarr = jsonResponse.getJSONArray("results");
+					for (int i = 0; i < venarr.length(); i++) {
+						venues.add(new Venue().buidFromGoogle(venarr
+								.getJSONObject(i)));
+					}
+					try {
+						nextPageToken = jsonResponse
+								.getString("next_page_token");
+					} catch (JSONException e) {
+						nextPageToken = "";
+					}
+					queries++;
+				} catch (ServerErrorException e) {
+					incRequest();
+				}
 			}
-			try {
-				nextPageToken = jsonResponse.getString("next_page_token");
-			} catch (JSONException e) {
-				nextPageToken = "";
-			}
-			queries++;
 			Thread.sleep(750); // Next page can take some time to be ready
 		} while (nextPageToken != null && !nextPageToken.isEmpty()
 				&& !nextPageToken.equalsIgnoreCase("null")
 				&& queries < MAX_QUERIES);
 		client.close();
 		return venues;
+	}
+
+	private void incRequest() throws InterruptedException {
+		requests++;
+		if (requests >= MAX_REQ_DAY) {
+			System.out.println("GOOGLE: Limit reached, waiting 1 day");
+			Thread.sleep(86025000);
+			requests = 1;
+		}
 	}
 
 	/**

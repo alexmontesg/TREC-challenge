@@ -143,14 +143,7 @@ public class YelpApi {
 		JSONArray venarr;
 		int offset = 0, limit = 20;
 		do {
-			requests++;
-			if (requests >= MAX_REQ_DAY) {
-				System.out.println("YELP: Limit reached, waiting 1 day");
-				Thread.sleep(86400000);
-				requests = 1;
-				SERVICE = null;
-				ACCESS_TOKEN = null;
-			}
+			incRequest();
 			OAuthRequest request = getBaseQuery(offset, limit);
 			for (int i = 0; i < parameters.length - 1; i += 2) {
 				request.addQuerystringParameter(parameters[i],
@@ -170,6 +163,17 @@ public class YelpApi {
 		} while (venarr.length() == limit);
 		client.close();
 		return venues;
+	}
+
+	private void incRequest() throws InterruptedException {
+		requests++;
+		if (requests >= MAX_REQ_DAY) {
+			System.out.println("YELP: Limit reached, waiting 1 day");
+			Thread.sleep(86400000);
+			requests = 1;
+			SERVICE = null;
+			ACCESS_TOKEN = null;
+		}
 	}
 
 	/**

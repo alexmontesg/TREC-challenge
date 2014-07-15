@@ -1,6 +1,7 @@
 package nl.tue;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class YelpThread extends Thread {
 					if(v.getUrl() == null || v.getUrl().isEmpty()) {
 						v.setUrl(fbVenue.getUrl());
 					}
-					List<String> categories = Arrays.asList(v.getCategories());
+					List<String> categories = new LinkedList<String>(Arrays.asList(v.getCategories()));
 					categories.addAll(Arrays.asList(fbVenue.getCategories()));
 					String[] catArr = new String[categories.size()];
 					v.setCategories(categories.toArray(catArr));

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -55,14 +56,9 @@ public class FacebookApi {
 	 */
 	public Venue getVenueByName(String name, double lat, double lon)
 			throws InterruptedException {
-		requests++;
-		if (requests >= MAX_REQ_10_MIN) {
-			Thread.sleep(600000);
-			requests = 1;
-			ACCESS_TOKEN = "";
-		}
+		incRequest();
 		List<Venue> venues = executeQuery(name);
-		if(venues.size() == 0) {
+		if (venues.size() == 0) {
 			return null;
 		}
 		Venue closest = venues.get(0);
@@ -79,26 +75,42 @@ public class FacebookApi {
 		return closest.getDistance() < 500 ? closest : null;
 	}
 
-	private List<Venue> executeQuery(String name) {
+	private void incRequest() throws InterruptedException {
+		requests++;
+		if (requests >= MAX_REQ_10_MIN) {
+			Thread.sleep(600000);
+			requests = 1;
+			ACCESS_TOKEN = "";
+		}
+	}
+
+	private List<Venue> executeQuery(String name) throws InterruptedException {
 		String query = "SELECT description, location.latitude, location.longitude, page_id, fan_count, categories.name, website FROM page WHERE name = \""
 				+ name + "\"";
 		List<Venue> venues = new LinkedList<Venue>();
 		Client client = ClientBuilder.newClient();
-		JSONArray venarr;
+		JSONArray venarr = null;
 		WebTarget target = getBaseQuery(client);
 		target = target.queryParam("q", query);
-		String response = target.request(MediaType.APPLICATION_JSON_TYPE).get(
-				String.class);
-		try{
-			venarr = new JSONObject(response).getJSONArray("data");
-			for (int i = 0; i < venarr.length(); i++) {
-				venues.add(new Venue().buidFromFacebook(venarr.getJSONObject(i),
-						name));
+		for (int tries = 0; tries < 3 && venarr == null; tries++) {
+			try {
+				String response = target.request(
+						MediaType.APPLICATION_JSON_TYPE).get(String.class);
+				try {
+					venarr = new JSONObject(response).getJSONArray("data");
+					for (int i = 0; i < venarr.length(); i++) {
+						venues.add(new Venue().buidFromFacebook(
+								venarr.getJSONObject(i), name));
+					}
+				} catch (JSONException e) {
+					return Collections.emptyList();
+				} finally {
+					client.close();
+				}
+			} catch (ServerErrorException e) {
+				incRequest();
 			}
-		} catch (JSONException e) {
-			return Collections.emptyList();
 		}
-		client.close();
 		return venues;
 	}
 

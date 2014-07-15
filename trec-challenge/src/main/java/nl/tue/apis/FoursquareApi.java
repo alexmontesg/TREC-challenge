@@ -3,6 +3,7 @@ package nl.tue.apis;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -67,9 +68,10 @@ public class FoursquareApi {
 	 * @param maxDistance
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
-	public List<Venue> getVenuesAround(double lat, double lon, int maxDistance) throws InterruptedException {
+	public List<Venue> getVenuesAround(double lat, double lon, int maxDistance)
+			throws InterruptedException {
 		return executeQuery("ll", lat + "," + lon, "radius", "" + maxDistance);
 	}
 
@@ -84,7 +86,7 @@ public class FoursquareApi {
 	 *            A category of the venue
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public List<Venue> getVenuesSection(double lat, double lon,
 			int maxDistance, Section section) throws InterruptedException {
@@ -103,7 +105,7 @@ public class FoursquareApi {
 	 *            A term to be searched against a venue's tips, category, etc.
 	 * @return All the {@link Venue venues} in the specified point and within
 	 *         the specified maximum distance
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public List<Venue> getVenuesQuery(double lat, double lon, int maxDistance,
 			String query) throws InterruptedException {
@@ -112,12 +114,7 @@ public class FoursquareApi {
 	}
 
 	public String[] getTips(String venueID) throws InterruptedException {
-		requests++;
-		if(requests >= MAX_REQ_HOUR) {
-			System.out.println("FOURSQUARE: Limit reached, waiting 1 hour");
-			Thread.sleep(3600000);
-			requests = 1;
-		}
+		incRequest();
 		Client client = ClientBuilder.newClient();
 		String[] tips;
 		try {
@@ -148,43 +145,54 @@ public class FoursquareApi {
 	 *            The parameters of the query. The parameter name has to be
 	 *            followed by another string with the parameter value
 	 * @return All the {@link Venue venues} that match the specified query
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	private List<Venue> executeQuery(String... parameters) throws InterruptedException {
 		List<Venue> venues = new LinkedList<Venue>();
 		Client client = ClientBuilder.newClient();
-		JSONArray venarr;
+		JSONArray venarr = new JSONArray();
 		int offset = 0, limit = 50;
 		do {
-			requests++;
-			if(requests >= MAX_REQ_HOUR) {
-				System.out.println("FOURSQUARE: Limit reached, waiting 1 hour");
-				Thread.sleep(3600000);
-				requests = 1;
-			}
+			incRequest();
 			WebTarget target = getBaseQuery(client, offset, limit);
 			for (int i = 0; i < parameters.length - 1; i += 2) {
 				target = target.queryParam(parameters[i], parameters[i + 1]);
 			}
-			String response = target.request(MediaType.APPLICATION_JSON_TYPE)
-					.get(String.class);
-			venarr = new JSONObject(response).getJSONObject("response")
-					.getJSONArray("groups").getJSONObject(0)
-					.getJSONArray("items");
-			for (int i = 0; i < venarr.length(); i++) {
-				JSONArray tips;
+			int old_offset = offset;
+			for (int tries = 0; tries < 3 && old_offset == offset; tries++) {
 				try {
-					tips = venarr.getJSONObject(i).getJSONArray("tips");
-				} catch (JSONException e) {
-					tips = new JSONArray();
+					String response = target.request(MediaType.APPLICATION_JSON_TYPE)
+							.get(String.class);
+					venarr = new JSONObject(response).getJSONObject("response")
+							.getJSONArray("groups").getJSONObject(0)
+							.getJSONArray("items");
+					for (int i = 0; i < venarr.length(); i++) {
+						JSONArray tips;
+						try {
+							tips = venarr.getJSONObject(i).getJSONArray("tips");
+						} catch (JSONException e) {
+							tips = new JSONArray();
+						}
+						venues.add(new Venue().buidFromFoursquare(
+								venarr.getJSONObject(i).getJSONObject("venue"), tips));
+					}
+					offset += limit;
+				} catch (ServerErrorException e){
+					incRequest();
 				}
-				venues.add(new Venue().buidFromFoursquare(
-						venarr.getJSONObject(i).getJSONObject("venue"), tips));
 			}
-			offset += limit;
 		} while (venarr.length() == limit);
 		client.close();
 		return venues;
+	}
+
+	private void incRequest() throws InterruptedException {
+		requests++;
+		if(requests >= MAX_REQ_HOUR) {
+			System.out.println("FOURSQUARE: Limit reached, waiting 1 hour");
+			Thread.sleep(3600000);
+			requests = 1;
+		}
 	}
 
 	/**
