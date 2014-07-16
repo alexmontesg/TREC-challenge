@@ -1,6 +1,7 @@
 package nl.tue;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,16 @@ public class YelpThread extends Thread {
 				e.printStackTrace();
 				System.err.println("Error retrieving venues at " + entry.getKey() +", " + entry.getValue());
 			}
-			System.out.println("YELP: " + ++i + "/50 contexts done");
+			System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+					+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+					+ Calendar.getInstance().get(Calendar.SECOND)
+					+ " YELP: " + ++i + "/50 contexts done");
 		}
 		i = 0;
-		System.out.println("YELP: Getting facebook info from " + venues.size() + " venues");
+		System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+				+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+				+ Calendar.getInstance().get(Calendar.SECOND)
+				+ " YELP: Getting facebook info from " + venues.size() + " venues");
 		for(Venue v : venues) {
 			try {
 				Venue fbVenue = apiFb.getVenueByName(v.getName(), v.getLat(), v.getLng());
@@ -56,9 +63,12 @@ public class YelpThread extends Thread {
 					v.setFacebook_likes(fbVenue.getFacebook_likes());
 				}
 				if(++i % 100 == 0){
-					System.out.println("YELP: Got facebook info from " + i + "/" + venues.size() + " venues");
+					System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+							+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+							+ Calendar.getInstance().get(Calendar.SECOND)
+							+ " YELP: Got facebook info from " + i + "/" + venues.size() + " venues");
 				}
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("Error retrieving facebook info from " + v.getName());
 			}

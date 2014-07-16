@@ -1,5 +1,6 @@
 package nl.tue.apis;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,6 +80,10 @@ public class FacebookApi {
 	private void incRequest() throws InterruptedException {
 		requests++;
 		if (requests >= MAX_REQ_10_MIN) {
+			System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+					+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+					+ Calendar.getInstance().get(Calendar.SECOND)
+					+ " FACEBOOK: Limit reached, waiting 10 miuntes");
 			Thread.sleep(600000);
 			requests = 1;
 			ACCESS_TOKEN = "";

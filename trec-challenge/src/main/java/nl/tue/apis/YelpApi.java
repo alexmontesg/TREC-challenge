@@ -1,5 +1,6 @@
 package nl.tue.apis;
 
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -168,7 +169,10 @@ public class YelpApi {
 	private void incRequest() throws InterruptedException {
 		requests++;
 		if (requests >= MAX_REQ_DAY) {
-			System.out.println("YELP: Limit reached, waiting 1 day");
+			System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+					+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+					+ Calendar.getInstance().get(Calendar.SECOND)
+					+ " YELP: Limit reached, waiting 1 day");
 			Thread.sleep(86400000);
 			requests = 1;
 			SERVICE = null;

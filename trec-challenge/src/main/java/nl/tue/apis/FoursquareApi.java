@@ -1,5 +1,6 @@
 package nl.tue.apis;
 
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -147,7 +148,8 @@ public class FoursquareApi {
 	 * @return All the {@link Venue venues} that match the specified query
 	 * @throws InterruptedException
 	 */
-	private List<Venue> executeQuery(String... parameters) throws InterruptedException {
+	private List<Venue> executeQuery(String... parameters)
+			throws InterruptedException {
 		List<Venue> venues = new LinkedList<Venue>();
 		Client client = ClientBuilder.newClient();
 		JSONArray venarr = new JSONArray();
@@ -161,8 +163,8 @@ public class FoursquareApi {
 			int old_offset = offset;
 			for (int tries = 0; tries < 3 && old_offset == offset; tries++) {
 				try {
-					String response = target.request(MediaType.APPLICATION_JSON_TYPE)
-							.get(String.class);
+					String response = target.request(
+							MediaType.APPLICATION_JSON_TYPE).get(String.class);
 					venarr = new JSONObject(response).getJSONObject("response")
 							.getJSONArray("groups").getJSONObject(0)
 							.getJSONArray("items");
@@ -173,11 +175,11 @@ public class FoursquareApi {
 						} catch (JSONException e) {
 							tips = new JSONArray();
 						}
-						venues.add(new Venue().buidFromFoursquare(
-								venarr.getJSONObject(i).getJSONObject("venue"), tips));
+						venues.add(new Venue().buidFromFoursquare(venarr
+								.getJSONObject(i).getJSONObject("venue"), tips));
 					}
 					offset += limit;
-				} catch (ServerErrorException e){
+				} catch (ServerErrorException e) {
 					incRequest();
 				}
 			}
@@ -188,8 +190,11 @@ public class FoursquareApi {
 
 	private void incRequest() throws InterruptedException {
 		requests++;
-		if(requests >= MAX_REQ_HOUR) {
-			System.out.println("FOURSQUARE: Limit reached, waiting 1 hour");
+		if (requests >= MAX_REQ_HOUR) {
+			System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+					+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+					+ Calendar.getInstance().get(Calendar.SECOND)
+					+ " FOURSQUARE: Limit reached, waiting 1 hour");
 			Thread.sleep(3600000);
 			requests = 1;
 		}

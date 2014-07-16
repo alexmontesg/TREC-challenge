@@ -1,6 +1,7 @@
 package nl.tue;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,16 @@ public class GoogleThread extends Thread {
 				e.printStackTrace();
 				System.err.println("Error retrieving venues at " + entry.getKey() +", " + entry.getValue());
 			}
-			System.out.println("GOOGLE: " + ++i + "/50 contexts done");
+			System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+					+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+					+ Calendar.getInstance().get(Calendar.SECOND)
+					+ " GOOGLE: " + ++i + "/50 contexts done");
 		}
 		i = 0;
-		System.out.println("GOOGLE: Getting facebook info from " + venues.size() + " venues");
+		System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+				+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+				+ Calendar.getInstance().get(Calendar.SECOND)
+				+ " GOOGLE: Getting facebook info from " + venues.size() + " venues");
 		for(Venue v : venues) {
 			try {
 				Venue fbVenue = apiFb.getVenueByName(v.getName(), v.getLat(), v.getLng());
@@ -56,9 +63,12 @@ public class GoogleThread extends Thread {
 					v.setFacebook_likes(fbVenue.getFacebook_likes());
 				}
 				if(++i % 100 == 0){
-					System.out.println("GOOGLE: Got facebook info from " + i + "/" + venues.size() + " venues");
+					System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+							+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+							+ Calendar.getInstance().get(Calendar.SECOND)
+							+ " GOOGLE: Got facebook info from " + i + "/" + venues.size() + " venues");
 				}
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("Error retrieving facebook info from " + v.getName());
 			}

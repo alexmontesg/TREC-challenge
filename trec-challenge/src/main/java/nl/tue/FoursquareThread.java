@@ -1,6 +1,7 @@
 package nl.tue;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,10 @@ public class FoursquareThread extends Thread {
 				e.printStackTrace();
 				System.err.println("Error retrieving venues at " + entry.getKey() +", " + entry.getValue());
 			}
-			System.out.println("FOURSQUARE: " + ++i + "/50 contexts done");
+			System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+					+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+					+ Calendar.getInstance().get(Calendar.SECOND)
+					+ " FOURSQUARE: " + ++i + "/50 contexts done");
 		}
 		i = 0;
 		for(Venue v : venues) {
@@ -42,14 +46,27 @@ public class FoursquareThread extends Thread {
 				v.setTips(api.getTips(v.getFoursquare_id()));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				System.err.println("Error retrieving tips from " + v.getFoursquare_id());
+				System.err.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+						+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+						+ Calendar.getInstance().get(Calendar.SECOND)
+						+ " Error retrieving tips from " + v.getFoursquare_id());
 			}
-			if(++i % 100 == 0){
-				System.out.println("FOURSQUARE: Got tips from " + i + "/" + venues.size() + " venues");
+			if(++i % 250 == 0){
+				System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+						+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+						+ Calendar.getInstance().get(Calendar.SECOND)
+						+ " FOURSQUARE: Got tips from " + i + "/" + venues.size() + " venues");
 			}
 		}
-		i = 0;
-		System.out.println("FOURSQUARE: Getting facebook info from " + venues.size() + " venues");
+		getFacebookInfo();
+	}
+
+	private void getFacebookInfo() {
+		int i = 0;
+		System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+				+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+				+ Calendar.getInstance().get(Calendar.SECOND)
+				+ " FOURSQUARE: Getting facebook info from " + venues.size() + " venues");
 		for(Venue v : venues) {
 			try {
 				Venue fbVenue = apiFb.getVenueByName(v.getName(), v.getLat(), v.getLng());
@@ -68,9 +85,12 @@ public class FoursquareThread extends Thread {
 					v.setFacebook_likes(fbVenue.getFacebook_likes());
 				}
 				if(++i % 100 == 0){
-					System.out.println("FOURSQUARE: Got facebook info from " + i + "/" + venues.size() + " venues");
+					System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+							+ ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
+							+ Calendar.getInstance().get(Calendar.SECOND)
+							+ " FOURSQUARE: Got facebook info from " + i + "/" + venues.size() + " venues");
 				}
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("Error retrieving facebook info from " + v.getName());
 			}
