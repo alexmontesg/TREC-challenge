@@ -27,8 +27,8 @@ import org.json.JSONObject;
 public class GooglePlacesApi {
 
 	private static final String API_KEY = "AIzaSyBeukipNQY4LtY84N4EL_VQLnYYZKi97bs";
-	private static final int MAX_QUERIES = 25; // 20 * MAX_QUERIES results
-	private static final int MAX_REQ_DAY = 950;
+	private static final int MAX_QUERIES = 19; // 20 * MAX_QUERIES results
+	private static final int MAX_REQ_DAY = 1000;
 	private static int requests = 0;
 	private static GooglePlacesApi instance = null;
 

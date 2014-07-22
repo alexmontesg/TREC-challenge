@@ -10,36 +10,32 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import nl.tue.apis.FacebookApi;
-import nl.tue.apis.FoursquareApi;
-import nl.tue.apis.FoursquareApi.Section;
-import nl.tue.apis.GooglePlacesApi;
-import nl.tue.apis.YelpApi;
 import nl.tue.model.Venue;
 
 public class App {
 
 	public static void main(String[] args) throws InterruptedException {
 		StringBuilder str = createTables();
+		str = new StringBuilder();
 		Map<Double, Double> locations = getLocations();
 		List<Venue> allVenues = new LinkedList<Venue>();
 		List<Venue> foursquareVenues = new LinkedList<Venue>();
-		List<Venue> googleVenues = new LinkedList<Venue>();
-		List<Venue> yelpVenues = new LinkedList<Venue>();
+		//List<Venue> googleVenues = new LinkedList<Venue>();
+		//List<Venue> yelpVenues = new LinkedList<Venue>();
 		FoursquareThread foursquare = new FoursquareThread(locations,
 				foursquareVenues);
 		foursquare.start();
-		GoogleThread google = new GoogleThread(locations, googleVenues);
-		google.start();
-		YelpThread yelp = new YelpThread(locations, yelpVenues);
-		yelp.start();
+		//GoogleThread google = new GoogleThread(locations, googleVenues);
+		//google.start();
+		//YelpThread yelp = new YelpThread(locations, yelpVenues);
+		//yelp.start();
 		foursquare.join();
 		allVenues.addAll(foursquareVenues);
-		yelp.join();
-		allVenues.addAll(yelpVenues);
-		google.join();
-		allVenues.addAll(googleVenues);
-		int i = 1;
+		//yelp.join();
+		//allVenues.addAll(yelpVenues);
+		//google.join();
+		//allVenues.addAll(googleVenues);
+		int i = 74741;
 		for (Venue v : allVenues) {
 			insertVenue(str, i, v);
 			i++;
@@ -49,7 +45,7 @@ public class App {
 		try {
 			writer = new BufferedWriter(
 					new OutputStreamWriter(new FileOutputStream(
-							"/home/TUE/amontes/Dropbox/script.sql"), "utf-8"));
+							"/home/TUE/amontes/Dropbox/script - foursquare.sql"), "utf-8"));
 			writer.write(str.toString());
 		} catch (IOException ex) {
 			// report
@@ -64,23 +60,23 @@ public class App {
 	private static void insertVenue(StringBuilder str, int i, Venue v) {
 		str.append("INSERT INTO venues VALUES(");
 		str.append(i);
-		str.append(", ");
+		str.append(", '");
 		str.append(v.getFoursquare_id());
-		str.append(", ");
+		str.append("', '");
 		str.append(v.getFacebook_id());
-		str.append(", ");
+		str.append("', '");
 		str.append(v.getGoogle_id());
-		str.append(", ");
+		str.append("', '");
 		str.append(v.getGoogle_reference());
-		str.append(", ");
+		str.append("', '");
 		str.append(v.getYelp_id());
-		str.append(", ");
-		str.append(v.getName());
-		str.append(", ");
-		str.append(v.getDescription());
-		str.append(", ");
+		str.append("', '");
+		str.append(v.getName().replaceAll("'", "''"));
+		str.append("', '");
+		str.append(v.getDescription().replaceAll("'", "''").replaceAll("\n", " "));
+		str.append("', '");
 		str.append(v.getUrl());
-		str.append(", ");
+		str.append("', ");
 		str.append(v.getScore());
 		str.append(", ");
 		str.append(v.getLat());
@@ -96,9 +92,9 @@ public class App {
 			for (int j = 0; j < arr.length; j++) {
 				str.append("INSERT INTO categories VALUES(");
 				str.append(i);
-				str.append(", ");
-				str.append(arr[j]);
-				str.append(");\n");
+				str.append(", '");
+				str.append(arr[j].replaceAll("'", "''").replaceAll("\n", " "));
+				str.append("');\n");
 			}
 		}
 		arr = v.getTips();
@@ -106,9 +102,9 @@ public class App {
 			for (int j = 0; j < arr.length; j++) {
 				str.append("INSERT INTO tips VALUES(");
 				str.append(i);
-				str.append(", ");
-				str.append(arr[j]);
-				str.append(");\n");
+				str.append(", '");
+				str.append(arr[j].replaceAll("'", "''").replaceAll("\n", " "));
+				str.append("');\n");
 			}
 		}
 	}
@@ -176,46 +172,5 @@ public class App {
 		return str;
 	}
 
-	private static void testFacebook() throws InterruptedException {
-		FacebookApi api = FacebookApi.getInstance();
-		System.out.println(api.getVenueByName("Dominick's 24 Hour Eatery",
-				42.124313901938, -80.079190272366));
-	}
-
-	private static void testFoursquare() throws InterruptedException {
-		FoursquareApi api = FoursquareApi.getInstance();
-		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
-		venues.addAll(api.getVenuesQuery(42.12922, -80.08506, 2500, "Amazing"));
-		venues.addAll(api.getVenuesSection(42.12922, -80.08506, 2500,
-				Section.FOOD));
-		for (Venue v : venues) {
-			System.out.println(v);
-		}
-		System.out.println(api.getTips(venues.get(0).getFoursquare_id()));
-	}
-
-	private static void testGoogle() throws InterruptedException {
-		GooglePlacesApi api = GooglePlacesApi.getInstance();
-		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
-		venues.addAll(api
-				.getVenuesKeyword(42.12922, -80.08506, 2500, "Amazing"));
-		String[] types = { "cafe" };
-		venues.addAll(api.getVenuesType(42.12922, -80.08506, 2500, types));
-		for (Venue v : venues) {
-			System.out.println(v);
-		}
-	}
-
-	private static void testYelp() throws InterruptedException {
-		YelpApi api = YelpApi.getInstance();
-		List<Venue> venues = api.getVenuesAround(42.12922, -80.08506, 2500);
-		venues.addAll(api
-				.getVenuesKeyword(42.12922, -80.08506, 2500, "Amazing"));
-		String[] types = { "cafes" };
-		venues.addAll(api.getVenuesType(42.12922, -80.08506, 2500, types));
-		for (Venue v : venues) {
-			System.out.println(v);
-		}
-	}
 
 }
