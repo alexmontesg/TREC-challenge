@@ -1,7 +1,6 @@
 package nl.tue.model;
 
 import java.util.Arrays;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,9 +49,9 @@ public class Venue {
 	}
 
 	public Venue buidFromGoogle(JSONObject jsonObject) {
-		this.name = getString(jsonObject, "name");
-		this.categories = getArray(jsonObject.getJSONArray("types"), false);
+            this.name = getString(jsonObject, "name");
 		try {
+		        this.categories = getArray(jsonObject.getJSONArray("types"), false);
 			this.lat = getDouble(jsonObject.getJSONObject("geometry")
 					.getJSONObject("location"), "lat");
 			this.lng = getDouble(jsonObject.getJSONObject("geometry")
