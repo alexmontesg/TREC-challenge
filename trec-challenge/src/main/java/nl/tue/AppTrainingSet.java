@@ -59,64 +59,11 @@ public class AppTrainingSet extends App {
     @Override
     public StringBuilder createTables() {
         StringBuilder str = new StringBuilder(
-                "CREATE TABLE trainingVenues(id int NOT NULL, foursquare_id varchar(255), facebook_id varchar(255), google_id varchar(255), google_reference varchar(255), yelp_id varchar(255), name varchar(255) NOT NULL, description text, url varchar(255), score double, lat double, lng double, distance int, facebook_likes int);\n");
+                "CREATE TABLE trainingVenues(id int NOT NULL, foursquare_id varchar(255), facebook_id varchar(255), google_id varchar(255), google_reference varchar(255), "
+                + "yelp_id varchar(255), name varchar(255) NOT NULL, description text, url varchar(255), foursquareScore double, yelpScore double, "
+                + "lat double, lng double, distance int, facebook_likes int);\n");
         str.append("CREATE TABLE trainingCategories(place_id int NOT NULL, category varchar(255) NOT NULL);\n");
         str.append("CREATE TABLE trainingTips(place_id int NOT NULL, tip text NOT NULL);\n");
         return str;
-    }
-
-    public void insertVenue(StringBuilder str, int i, Venue v) {
-        if (str == null) {
-            str = new StringBuilder();
-        }
-        str.append("INSERT INTO trainingVenues VALUES(");
-        str.append(i);
-        str.append(", ");
-        str.append(v.getFoursquare_id());
-        str.append(", ");
-        str.append(v.getFacebook_id());
-        str.append(", ");
-        str.append(v.getGoogle_id());
-        str.append(", ");
-        str.append(v.getGoogle_reference());
-        str.append(", ");
-        str.append(v.getYelp_id());
-        str.append(", ");
-        str.append(v.getName());
-        str.append(", ");
-        str.append(v.getDescription());
-        str.append(", ");
-        str.append(v.getUrl());
-        str.append(", ");
-        str.append(v.getScore());
-        str.append(", ");
-        str.append(v.getLat());
-        str.append(", ");
-        str.append(v.getLng());
-        str.append(", ");
-        str.append(v.getDistance());
-        str.append(", ");
-        str.append(v.getFacebook_likes());
-        str.append(");\n");
-        String[] arr = v.getCategories();
-        if (arr != null) {
-            for (int j = 0; j < arr.length; j++) {
-                str.append("INSERT INTO trainingCategories VALUES(");
-                str.append(i);
-                str.append(", ");
-                str.append(arr[j]);
-                str.append(");\n");
-            }
-        }
-        arr = v.getTips();
-        if (arr != null) {
-            for (int j = 0; j < arr.length; j++) {
-                str.append("INSERT INTO trainingTips VALUES(");
-                str.append(i);
-                str.append(", ");
-                str.append(arr[j]);
-                str.append(");\n");
-            }
-        }
     }
 }

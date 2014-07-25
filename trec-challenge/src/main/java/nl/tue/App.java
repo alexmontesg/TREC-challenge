@@ -20,6 +20,9 @@ public abstract class App {
 
     private static App app;
     private static boolean training;
+    private static String tableName1;
+    private static String tableName2;
+    private static String tableName3;
 
     public static void startThreads(FoursquareThread foursquare, GoogleThread google, YelpThread yelp, List<Venue> allVenues, List<Venue> foursquareVenues, List<Venue> yelpVenues, List<Venue> googleVenues) throws InterruptedException {
         foursquare.start();
@@ -46,7 +49,7 @@ public abstract class App {
         if (args[1].equals("local")) {
             path = "/Users/Julia/Projects/TREC_contextual_suggestion/script/training.sql";
         } else if (args[1].equals("server")) {
-            path = "/home/data/trec_challenge/trec-challenge/training/csript.sql";
+            path = "/home/data/trec_challenge/trec-challenge/training/sript.sql";
         } else {
             throw new IllegalArgumentException("specify args[1]: local or sever");
         }
@@ -61,9 +64,6 @@ public abstract class App {
             } catch (Exception ex) {
             }
         }
-    }
-
-    public App() {
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -82,6 +82,9 @@ public abstract class App {
             foursquare = new FoursquareThread(locations, foursquareVenues, training);
             google = new GoogleThread(locations, googleVenues, training);
             yelp = new YelpThread(locations, yelpVenues, training);
+            tableName1 = "venues";
+            tableName2 = "categories";
+            tableName3 = "tips";
         } else if (args[0].equals("training")) {
             app = new AppTrainingSet();
             app.createTables();
@@ -90,15 +93,15 @@ public abstract class App {
             foursquare = new FoursquareThread(keywords, foursquareVenues, training);
             google = new GoogleThread(keywords, googleVenues, training);
             yelp = new YelpThread(keywords, yelpVenues, training);
+            tableName1 = "trainingVenues";
+            tableName2 = "trainingCategories";
+            tableName3 = "trainingTips";
         } else {
             throw new IllegalArgumentException("specify args[0]: all or training");
         }
         startThreads(foursquare, google, yelp, allVenues, foursquareVenues, yelpVenues, googleVenues);
         writeSQLOuput(allVenues, args);
-
     }
-
-    public abstract void insertVenue(StringBuilder str, int i, Venue v);
 
     public abstract Map<Double, Double> getLocations();
 
@@ -147,4 +150,46 @@ public abstract class App {
     }
 
     public abstract List<ApiKeyword> getKeyword();
+
+    public void insertVenue(StringBuilder str, int i, Venue v) {
+        if (str == null) {
+            str = new StringBuilder();
+        }
+        str.append("INSERT INTO ").append(tableName1).append(" VALUES(");
+        str.append(i);
+        str.append("\"").append(v.getFoursquare_id()).append("\"").append(", ");
+        str.append("\"").append(v.getFacebook_id()).append("\"").append(", ");
+        str.append("\"").append(v.getGoogle_id()).append("\"").append(", ");
+        str.append("\"").append(v.getGoogle_reference()).append("\"").append(", ");
+        str.append("\"").append(v.getYelp_id()).append("\"").append(", ");
+        str.append("\"").append(v.getName().replaceAll("[^a-zA-Z0-9 ]", "")).append("\"").append(", ");
+        str.append("\"").append(v.getDescription().replaceAll("[^a-zA-Z0-9 ]", "")).append("\"").append(", ");
+        str.append("\"").append(v.getUrl()).append("\"").append(", ");
+        str.append(v.getFoursquareScore()).append(", ");
+        str.append(v.getYelpScore()).append(", ");
+        str.append(v.getLat()).append(", ");
+        str.append(v.getLng()).append(", ");
+        str.append(v.getDistance()).append(", ");
+        str.append(v.getFacebook_likes()).append(");\n");
+//        String[] arr = v.getCategories();
+//        if (arr != null) {
+//            for (int j = 0; j < arr.length; j++) {
+//                str.append("INSERT INTO ").append(tableName2).append(" VALUES(");
+//                str.append(i);
+//                str.append(", ");
+//                str.append("\"").append(arr[j].replaceAll("[^a-zA-Z0-9 ]", "")).append("\"");
+//                str.append(");\n");
+//            }
+//        }
+//        arr = v.getTips();
+//        if (arr != null) {
+//            for (int j = 0; j < arr.length; j++) {
+//                str.append("INSERT INTO  ").append(tableName3).append(" VALUES (");
+//                str.append(i);
+//                str.append(", ");
+//                str.append("\"").append(arr[j].replaceAll("[^a-zA-Z0-9 ]", "")).append("\"");
+//                str.append(");\n");
+//            }
+//        }
+    }
 }
