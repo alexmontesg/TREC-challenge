@@ -60,7 +60,8 @@ public class FeatureExtractor extends BaseDalc{
             
      private List<Line4RankLib> extracFeatures(String tableFeatures, boolean isLabeled) {
         final List<Line4RankLib> listFeatures = new LinkedList<Line4RankLib>();
-        final String query = "SELECT Title FROM "+ tableFeatures;
+        final String query = "SELECT * FROM "+ tableFeatures;
+        System.err.println(query);
         try {
             if (statement == null) {
                 statement = conn.createStatement();

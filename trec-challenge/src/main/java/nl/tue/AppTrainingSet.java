@@ -60,7 +60,7 @@ public class AppTrainingSet extends App {
     public StringBuilder createTables() {
         StringBuilder str = new StringBuilder(
                 "CREATE TABLE trainingVenues(id int NOT NULL, foursquare_id varchar(255), facebook_id varchar(255), google_id varchar(255), google_reference varchar(255), "
-                + "yelp_id varchar(255), name varchar(255) NOT NULL, description text, url varchar(255), foursquareScore double, yelpScore double, "
+                + "yelp_id varchar(255), name varchar(255) NOT NULL, description text, url varchar(255), foursquare_score double, yelp_score double, "
                 + "lat double, lng double, distance int, facebook_likes int);\n");
         str.append("CREATE TABLE trainingCategories(place_id int NOT NULL, category varchar(255) NOT NULL);\n");
         str.append("CREATE TABLE trainingTips(place_id int NOT NULL, tip text NOT NULL);\n");

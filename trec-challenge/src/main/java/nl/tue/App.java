@@ -156,7 +156,7 @@ public abstract class App {
             str = new StringBuilder();
         }
         str.append("INSERT INTO ").append(tableName1).append(" VALUES(");
-        str.append(i);
+        str.append(i).append(", ");
         str.append("\"").append(v.getFoursquare_id()).append("\"").append(", ");
         str.append("\"").append(v.getFacebook_id()).append("\"").append(", ");
         str.append("\"").append(v.getGoogle_id()).append("\"").append(", ");

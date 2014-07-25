@@ -32,15 +32,17 @@ t2.name,
 t2.id,
 t2.foursquare_score,
 t2.yelp_score,
+t2.facebook_likes,
+t2.distance,
 t2.lat,
 t2.lng,
 t2.description AS SN_description, 
-t2.url,
+t2.url as SN_url,
 t2.foursquare_id,
 t2.facebook_id,
 t2.yelp_id
 FROM trainingProfiles2Examples t1 INNER JOIN trainingVenues t2 
-ON t1.name like t2.Title;
+ON t2.name like t1.Title;
 
     select place_id, count(place_id) AS _count FROM categories group by place_id order by _count ;
 /*
