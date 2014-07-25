@@ -23,7 +23,7 @@ public abstract class App {
 
     public App(){}
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         List<Venue> allVenues = new LinkedList<Venue>();
         List<Venue> foursquareVenues = new LinkedList<Venue>();
         List<Venue> googleVenues = new LinkedList<Venue>();
@@ -65,16 +65,16 @@ public abstract class App {
             app.insertVenue(str, i, v);
             i++;
         }
-
+        System.err.printf("String where bug can be [\t%s\t]", str);
         Writer writer = null;
         try {
             writer = new BufferedWriter(
                     new OutputStreamWriter(new FileOutputStream(
-                   // "/home/TUE/amontes/Dropbox/script.sql"), "utf-8")));
+                    //"/home/data/trec_challenge/trec-challenge/training/csript.sql"), "utf-8"));
                    "/home/Julia/Projects/script/training.sql")));
             writer.write(str.toString());
         } catch (IOException ex) {
-            // report
+            throw new RuntimeException("Something is wrong with writing to file");
         } finally {
             try {
                 writer.close();

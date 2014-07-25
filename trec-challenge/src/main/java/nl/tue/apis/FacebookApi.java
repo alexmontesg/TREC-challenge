@@ -17,8 +17,8 @@ import org.json.JSONObject;
 
 public class FacebookApi {
 
-    private static final String APP_ID = "424680681007882";
-    private static final String APP_SECRET = "fa82e06599fa009d890dd673002e6995";
+    private static final String APP_ID = "260463634148683"; 
+    private static final String APP_SECRET = "03b37f2f14083f4abf40d8ba2e285b87";
     private static String ACCESS_TOKEN = "";
     private static final int MAX_REQ_10_MIN = 300;
     private static int requests = 0;

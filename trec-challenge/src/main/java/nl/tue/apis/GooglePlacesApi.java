@@ -3,15 +3,12 @@ package nl.tue.apis;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-
 import nl.tue.model.Venue;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +17,7 @@ import org.json.JSONObject;
  * 
  * API that interacts with <a href="http://www.google.com">Google</a>.
  * 
- * @author Alejandro Montes García
+ * @author Alejandro Montes Garcia
  * @author Julia Kiseleva
  * 
  */
