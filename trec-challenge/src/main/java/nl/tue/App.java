@@ -21,7 +21,49 @@ public abstract class App {
     private static App app;
     private static boolean training;
 
-    public App(){}
+    public static void startThreads(FoursquareThread foursquare, GoogleThread google, YelpThread yelp, List<Venue> allVenues, List<Venue> foursquareVenues, List<Venue> yelpVenues, List<Venue> googleVenues) throws InterruptedException {
+        foursquare.start();
+        google.start();
+        yelp.start();
+        foursquare.join();
+        allVenues.addAll(foursquareVenues);
+        yelp.join();
+        allVenues.addAll(yelpVenues);
+        google.join();
+        allVenues.addAll(googleVenues);
+    }
+
+    public static void writeSQLOuput(List<Venue> allVenues, StringBuilder str, String[] args) throws RuntimeException, IllegalArgumentException {
+        int i = 1;
+        for (Venue v : allVenues) {
+            app.insertVenue(str, i, v);
+            i++;
+        }
+        System.err.printf("String where bug can be [\t%s\t]", str);
+        Writer writer = null;
+        String path = null;
+        if (args[1].equals("local")) {
+            path = "/home/Julia/Projects/script/training.sql";
+        } else if (args[1].equals("server")) {
+            path = "/home/data/trec_challenge/trec-challenge/training/csript.sql";
+        } else {
+            throw new IllegalArgumentException("specify args[1]: local or sever");
+        }
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "utf-8"));
+            writer.write(str.toString());
+        } catch (IOException ex) {
+            throw new RuntimeException("Something is wrong with writing to file");
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception ex) {
+            }
+        }
+    }
+
+    public App() {
+    }
 
     public static void main(String[] args) throws InterruptedException, IOException {
         List<Venue> allVenues = new LinkedList<Venue>();
@@ -51,36 +93,9 @@ public abstract class App {
         } else {
             throw new IllegalArgumentException("specify args[0]: all or training");
         }
-        foursquare.start();
-        google.start();
-        yelp.start();
-        foursquare.join();
-        allVenues.addAll(foursquareVenues);
-        yelp.join();
-        allVenues.addAll(yelpVenues);
-        google.join();
-        allVenues.addAll(googleVenues);
-        int i = 1;
-        for (Venue v : allVenues) {
-            app.insertVenue(str, i, v);
-            i++;
-        }
-        System.err.printf("String where bug can be [\t%s\t]", str);
-        Writer writer = null;
-        try {
-            writer = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(
-                    //"/home/data/trec_challenge/trec-challenge/training/csript.sql"), "utf-8"));
-                   "/home/Julia/Projects/script/training.sql")));
-            writer.write(str.toString());
-        } catch (IOException ex) {
-            throw new RuntimeException("Something is wrong with writing to file");
-        } finally {
-            try {
-                writer.close();
-            } catch (Exception ex) {
-            }
-        }
+        startThreads(foursquare, google, yelp, allVenues, foursquareVenues, yelpVenues, googleVenues);
+        writeSQLOuput(allVenues, str, args);
+
     }
 
     public abstract void insertVenue(StringBuilder str, int i, Venue v);
