@@ -23,7 +23,7 @@ import org.scribe.oauth.OAuthService;
  * 
  * API that interacts with <a href="http://www.yelp.com">Yelp</a>.
  * 
- * @author Alejandro Montes García
+ * @author Alejandro Montes Garcia
  * @author Julia Kiseleva
  * 
  */

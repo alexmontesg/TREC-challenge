@@ -11,24 +11,23 @@ import nl.tue.model.ApiKeyword;
 import nl.tue.model.Venue;
 
 public class GoogleThread extends Thread {
-	
-	private Map<Double, Double> locations;
-	private List<Venue> venues;
-	private GooglePlacesApi api;
-	private FacebookApi apiFb;
-        private boolean training;
-        private List<ApiKeyword> keywords;
-	
-	public GoogleThread(final Map<Double, Double> locations, final List<Venue> venues, boolean training) {
-		super("Google");
-		api = GooglePlacesApi.getInstance();
-		apiFb = FacebookApi.getInstance();
-		this.locations = locations;
-		this.venues = venues;
-                this.training = training;
-	}
-        
-       
+
+    private Map<Double, Double> locations;
+    private List<Venue> venues;
+    private GooglePlacesApi api;
+    private FacebookApi apiFb;
+    private boolean training;
+    private List<ApiKeyword> keywords;
+
+    public GoogleThread(final Map<Double, Double> locations, final List<Venue> venues, boolean training) {
+        super("Google");
+        api = GooglePlacesApi.getInstance();
+        apiFb = FacebookApi.getInstance();
+        this.locations = locations;
+        this.venues = venues;
+        this.training = training;
+    }
+
     public GoogleThread(final List<ApiKeyword> keywords, List<Venue> venues, boolean training) {
         super("Google");
         api = GooglePlacesApi.getInstance();
@@ -41,13 +40,16 @@ public class GoogleThread extends Thread {
     public void getVenuesKeyword() {
         for (ApiKeyword keyword : keywords) {
             try {
-                venues.addAll(api.getVenuesKeyword(keyword.getLatitude(), keyword.getLognitude(), keyword.getMaxDistance(), keyword.getPlaceName()));
+                venues.add(DistanceUtils.processSimilarVenue(api.getVenuesKeyword(keyword.getLatitude(), keyword.getLognitude(), 
+                        keyword.getMaxDistance(), keyword.getPlaceName()),keyword));
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 System.err.printf("Error retrieving venues at keyword [%s]", keyword.getPlaceName());
             }
         }
     }
+    
+
 
     public void getVenuesLocation() {
         int i = 0;
@@ -64,7 +66,7 @@ public class GoogleThread extends Thread {
                     + "Google" + ++i + "/50 contexts done");
         }
     }
-    
+
     public void processVenue(Venue v, int i) throws InterruptedException {
         Venue fbVenue = apiFb.getVenueByName(v.getName(), v.getLat(), v.getLng());
         if (fbVenue != null) {
@@ -88,11 +90,12 @@ public class GoogleThread extends Thread {
                     + " GOOGLE: Got facebook info from " + i + "/" + venues.size() + " venues");
         }
     }
-	  @Override
+
+    @Override
     public void run() {
-        if(training == true){
+        if (training == true) {
             getVenuesKeyword();
-        } else{
+        } else {
             getVenuesLocation();
         }
         int i = 0;
@@ -109,5 +112,4 @@ public class GoogleThread extends Thread {
             }
         }
     }
-
 }

@@ -41,9 +41,9 @@ public class FoursquareThread extends Thread {
     public void getVenuesKeyword() {
         for (ApiKeyword keyword : keywords) {
             try {
-                venues.addAll(api.getVenuesQuery(keyword.getLatitude(), keyword.getLognitude(), keyword.getMaxDistance(), keyword.getPlaceName()));
+                List<Venue> currenVenues = api.getVenuesQuery(keyword.getLatitude(), keyword.getLognitude(), keyword.getMaxDistance(), keyword.getPlaceName());
+                venues.add(DistanceUtils.processSimilarVenue(currenVenues,keyword));
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 System.err.printf("Error retrieving venues at keyword [%s]", keyword.getPlaceName());
             }
         }
@@ -55,7 +55,6 @@ public class FoursquareThread extends Thread {
             try {
                 venues.addAll(api.getVenuesAround(entry.getKey(), entry.getValue(), 25000));
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 System.err.println("Error retrieving venues at " + entry.getKey() + ", " + entry.getValue());
             }
             System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
