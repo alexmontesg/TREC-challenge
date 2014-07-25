@@ -33,8 +33,9 @@ public abstract class App {
         //allVenues.addAll(googleVenues);
     }
 
-    public static void writeSQLOuput(List<Venue> allVenues, StringBuilder str, String[] args) throws RuntimeException, IllegalArgumentException {
+    public static void writeSQLOuput(final List<Venue> allVenues, final String[] args) throws RuntimeException, IllegalArgumentException {
         int i = 1;
+        StringBuilder str = new StringBuilder();
         for (Venue v : allVenues) {
             app.insertVenue(str, i, v);
             i++;
@@ -70,7 +71,6 @@ public abstract class App {
         List<Venue> foursquareVenues = new LinkedList<Venue>();
         List<Venue> googleVenues = new LinkedList<Venue>();
         List<Venue> yelpVenues = new LinkedList<Venue>();
-        StringBuilder str = null;
         FoursquareThread foursquare = null;
         GoogleThread google = null;
         YelpThread yelp = null;
@@ -94,7 +94,7 @@ public abstract class App {
             throw new IllegalArgumentException("specify args[0]: all or training");
         }
         startThreads(foursquare, google, yelp, allVenues, foursquareVenues, yelpVenues, googleVenues);
-        writeSQLOuput(allVenues, str, args);
+        writeSQLOuput(allVenues, args);
 
     }
 
