@@ -90,6 +90,9 @@ public class AppAll extends App {
     }
     
      public void insertVenue(StringBuilder str, int i, Venue v) {
+         if(str == null){
+          str = new StringBuilder();
+         }
             str.append("INSERT INTO venues VALUES(");
             str.append(i);
             str.append(", ");

@@ -23,14 +23,14 @@ public abstract class App {
 
     public static void startThreads(FoursquareThread foursquare, GoogleThread google, YelpThread yelp, List<Venue> allVenues, List<Venue> foursquareVenues, List<Venue> yelpVenues, List<Venue> googleVenues) throws InterruptedException {
         foursquare.start();
-        google.start();
+        //google.start();
         yelp.start();
         foursquare.join();
         allVenues.addAll(foursquareVenues);
         yelp.join();
         allVenues.addAll(yelpVenues);
-        google.join();
-        allVenues.addAll(googleVenues);
+        //google.join();
+        //allVenues.addAll(googleVenues);
     }
 
     public static void writeSQLOuput(List<Venue> allVenues, StringBuilder str, String[] args) throws RuntimeException, IllegalArgumentException {
@@ -43,7 +43,7 @@ public abstract class App {
         Writer writer = null;
         String path = null;
         if (args[1].equals("local")) {
-            path = "/home/Julia/Projects/script/training.sql";
+            path = "/Users/Julia/Projects/TREC_contextual_suggestion/script/training.sql";
         } else if (args[1].equals("server")) {
             path = "/home/data/trec_challenge/trec-challenge/training/csript.sql";
         } else {
