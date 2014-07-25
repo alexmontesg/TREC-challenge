@@ -41,13 +41,16 @@ public class FoursquareThread extends Thread {
     public void getVenuesKeyword() {
         for (ApiKeyword keyword : keywords) {
             try {
-                List<Venue> currenVenues = api.getVenuesQuery(keyword.getLatitude(), keyword.getLognitude(), keyword.getMaxDistance(), keyword.getPlaceName());
+                List<Venue> currenVenues = api.getVenuesQuery(keyword.getLatitude(),keyword.getLognitude(),keyword.getMaxDistance(),keyword.getPlaceName());
+                if(!currenVenues.isEmpty()){
                 venues.add(DistanceUtils.processSimilarVenue(currenVenues,keyword));
+                }
             } catch (InterruptedException e) {
                 System.err.printf("Error retrieving venues at keyword [%s]", keyword.getPlaceName());
             }
         }
     }
+
 
     public void getVenuesLocation() {
         int i = 0;
@@ -66,6 +69,7 @@ public class FoursquareThread extends Thread {
 
     public void processVenue(Venue v, int i) throws InterruptedException {
         Venue fbVenue = apiFb.getVenueByName(v.getName(), v.getLat(), v.getLng());
+       
         if (fbVenue != null) {
             if (v.getDescription() == null || v.getDescription().length() < fbVenue.getDescription().length()) {
                 v.setDescription(fbVenue.getDescription());
@@ -101,11 +105,13 @@ public class FoursquareThread extends Thread {
                 + Calendar.getInstance().get(Calendar.SECOND)
                 + " Foursquare: Getting facebook info from " + venues.size() + " venues");
         for (Venue v : venues) {
+            if(v != null){
             try {
                 processVenue(v, i);
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println("Error retrieving facebook info from " + v.getName());
+            }
             }
         }
         getFacebookInfo();

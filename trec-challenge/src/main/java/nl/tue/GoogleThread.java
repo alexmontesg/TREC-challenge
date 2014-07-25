@@ -40,16 +40,15 @@ public class GoogleThread extends Thread {
     public void getVenuesKeyword() {
         for (ApiKeyword keyword : keywords) {
             try {
-                venues.add(DistanceUtils.processSimilarVenue(api.getVenuesKeyword(keyword.getLatitude(), keyword.getLognitude(), 
-                        keyword.getMaxDistance(), keyword.getPlaceName()),keyword));
+                List<Venue> currenVenues = api.getVenuesKeyword(keyword.getLatitude(), keyword.getLognitude(), keyword.getMaxDistance(), keyword.getPlaceName());
+                if (!currenVenues.isEmpty()) {
+                    venues.add(DistanceUtils.processSimilarVenue(currenVenues, keyword));
+                }
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 System.err.printf("Error retrieving venues at keyword [%s]", keyword.getPlaceName());
             }
         }
     }
-    
-
 
     public void getVenuesLocation() {
         int i = 0;
@@ -57,7 +56,6 @@ public class GoogleThread extends Thread {
             try {
                 venues.addAll(api.getVenuesAround(entry.getKey(), entry.getValue(), 25000));
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 System.err.println("Error retrieving venues at " + entry.getKey() + ", " + entry.getValue());
             }
             System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
@@ -104,11 +102,12 @@ public class GoogleThread extends Thread {
                 + Calendar.getInstance().get(Calendar.SECOND)
                 + " Google: Getting facebook info from " + venues.size() + " venues");
         for (Venue v : venues) {
-            try {
-                processVenue(v, i);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Error retrieving facebook info from " + v.getName());
+            if (v != null) {
+                try {
+                    processVenue(v, i);
+                } catch (Exception e) {
+                    System.err.println("Error retrieving facebook info from " + v.getName());
+                }
             }
         }
     }

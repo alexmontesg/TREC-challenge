@@ -42,7 +42,9 @@ public class YelpThread extends Thread {
         for (ApiKeyword keyword : keywords) {
             try {
                 List<Venue> currenVenues = api.getVenuesKeyword(keyword.getLatitude(),keyword.getLognitude(),keyword.getMaxDistance(),keyword.getPlaceName());
+                if(!currenVenues.isEmpty()){
                 venues.add(DistanceUtils.processSimilarVenue(currenVenues,keyword));
+                }
             } catch (InterruptedException e) {
                 System.err.printf("Error retrieving venues at keyword [%s]", keyword.getPlaceName());
             }
@@ -98,14 +100,15 @@ public class YelpThread extends Thread {
         int i = 0;
         System.out.println(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
                 + ":" + Calendar.getInstance().get(Calendar.MINUTE) + ":"
-                + Calendar.getInstance().get(Calendar.SECOND)
-                + " YELP: Getting facebook info from " + venues.size() + " venues");
-        for (Venue v : venues) {
+                + Calendar.getInstance().get(Calendar.SECOND));
+          for (Venue v : venues) {
+            if(v != null){
             try {
                 processVenue(v, i);
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println("Error retrieving facebook info from " + v.getName());
+            }
             }
         }
     }
