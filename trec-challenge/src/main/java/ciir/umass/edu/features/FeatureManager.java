@@ -101,8 +101,7 @@ public class FeatureManager {
 			String content = "";
 			BufferedReader in = new BufferedReader(
 					new InputStreamReader(
-							new FileInputStream(fn), "ASCII"));
-			
+					new FileInputStream(fn), "ASCII"));
 			String lastID = "";
 			//int countID = 0;
 			boolean hasRel = false;

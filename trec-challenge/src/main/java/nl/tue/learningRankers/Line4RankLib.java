@@ -16,9 +16,9 @@ public class Line4RankLib {
     private int profileId;
     private final List<Feature> features;
     private boolean isLabeled;
-    private final String extraInfo;
+    private final Integer extraInfo;
 
-    public Line4RankLib(int profileId, boolean isLabeled, int label, List<Feature> features, String extraInfo) {
+    public Line4RankLib(int profileId, boolean isLabeled, int label, List<Feature> features, Integer extraInfo) {
         this.label = label;
         this.profileId = profileId;
         this.features = features;
@@ -26,7 +26,7 @@ public class Line4RankLib {
         this.extraInfo = extraInfo;
     }
 
-    public Line4RankLib(int profileId, boolean isLabeled, List<Feature> features, String extraInfo) {
+    public Line4RankLib(int profileId, boolean isLabeled, List<Feature> features, Integer extraInfo) {
         this.label = label;
         this.profileId = profileId;
         this.features = features;
@@ -76,9 +76,9 @@ public class Line4RankLib {
         }
         str.append(" qid:").append(profileId);
         for (Feature feature : features) {
-            str.append(" ").append(feature.getValue());
+            str.append(" ").append(feature.toString());
         }
-        if (!this.extraInfo.isEmpty()) {
+        if (this.extraInfo != null) {
             str.append(" ").append("# ").append(extraInfo);
         }
         str.append("\n");

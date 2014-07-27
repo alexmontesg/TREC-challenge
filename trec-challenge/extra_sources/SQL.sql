@@ -44,7 +44,7 @@ t2.yelp_id
 FROM trainingProfiles2Examples t1 INNER JOIN trainingVenues t2 
 ON t2.name like t1.Title;
 
-    select place_id, count(place_id) AS _count FROM categories group by place_id order by _count ;
+select place_id, count(place_id) AS _count FROM categories group by place_id order by _count ;
 /*
 result:
 |     9859 |      8 |
@@ -64,3 +64,14 @@ SELECT DISTINCT t.category FROM
 (SELECT category FROM categories 
  UNION ALL 
  SELECT category FROM trainingCategories) t;
+
+
+
+create table training_finalCategorises AS 
+SELECT t1.place_id, t2.id AS category_id, t1.category 
+FROM training_categories t1 INNER JOIN listCategories t2 
+ON (t1.category = t2.category);
+
+create table finalCategorises AS  
+SELECT t1.place_id, t2.id AS category_id, t1.category  
+FROM categories t1 LEFT  JOIN listCategories t2  ON (t1.category = t2.category);

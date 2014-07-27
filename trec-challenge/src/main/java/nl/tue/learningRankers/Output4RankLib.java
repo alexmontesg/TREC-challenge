@@ -19,7 +19,7 @@ public class Output4RankLib {
        
     private List<Line4RankLib> profiles;
     
-    public Output4RankLib(List<Line4RankLib> profiles) {
+    public Output4RankLib(final List<Line4RankLib> profiles) {
         this.profiles = profiles;
     }
     

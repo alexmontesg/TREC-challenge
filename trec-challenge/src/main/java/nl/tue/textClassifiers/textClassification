@@ -1,0 +1,12 @@
+//download mallet from http://mallet.cs.umass.edu/download.php
+// we need bin/mallet. 
+
+## Export data from database
+training:
+
+testing:
+
+# Train Models:
+
+
+# Use Models:
