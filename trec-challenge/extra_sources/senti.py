@@ -14,4 +14,4 @@ with open('examples2014.csv', 'rb') as f:
 		if(row[0]=='id'):
 			print(row[0]+",sentiment")
 		else:
-			print(row[0]+','+str(senti(row[2])))
+			print(row[0]+','+str(senti(row[1])))

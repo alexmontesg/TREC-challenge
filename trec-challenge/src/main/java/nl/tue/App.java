@@ -93,9 +93,9 @@ public abstract class App {
             foursquare = new FoursquareThread(keywords, foursquareVenues, training);
             google = new GoogleThread(keywords, googleVenues, training);
             yelp = new YelpThread(keywords, yelpVenues, training);
-            tableName1 = "trainingVenues";
-            tableName2 = "trainingCategories";
-            tableName3 = "trainingTips";
+            tableName1 = "training_Venues";
+            tableName2 = "training_Categories";
+            tableName3 = "training_Tips";
         } else {
             throw new IllegalArgumentException("specify args[0]: all or training");
         }
