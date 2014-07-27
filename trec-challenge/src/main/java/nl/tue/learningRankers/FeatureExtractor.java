@@ -23,13 +23,12 @@ public class FeatureExtractor {
             throw new IllegalArgumentException("Specify feature type (name of the table, where features are stored) As agrs[2]");
         }
         if (args[0].equals("train")) {
-            forRankLib = fExt.getResult("training_", "_" + featureType, true);
+            forRankLib = fExt.getResult("training_", "_" + featureType);
         } else if (args[0].equals("test")) {
-            forRankLib = fExt.getResult("", "_" + featureType, false);
+            forRankLib = fExt.getResult("", "_" + featureType);
         } else {
             throw new IllegalArgumentException("specify right featureType; args[0]");
         }
-        
         if (args[1].equals("local")) {
             if (args[0].equals("train")) {
                 forRankLib.writeRankLibOuput("/Users/Julia/Projects/TREC_contextual_suggestion/rankLib_train.lst");
@@ -38,9 +37,9 @@ public class FeatureExtractor {
             }
         } else {
             if (args[0].equals("train")) {
-                forRankLib.writeRankLibOuput("/home/data/trec_challenge/trec-challenge/training/rankLib_train.lst");
+                forRankLib.writeRankLibOuput("/home/data/trec_challenge/RankLibInputs/rankLib_train.lst");
             } else {
-                forRankLib.writeRankLibOuput("/home/data/trec_challenge/trec-challenge/training/rankLib_rank.lst");
+                forRankLib.writeRankLibOuput("/home/data/trec_challenge/RankLibInputs/rankLib_rank.lst");
             }
         }
     }

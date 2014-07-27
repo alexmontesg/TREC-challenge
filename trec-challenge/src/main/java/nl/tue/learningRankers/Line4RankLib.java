@@ -5,6 +5,7 @@
 package nl.tue.learningRankers;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,10 +15,11 @@ import java.util.List;
 public class Line4RankLib {
 
     private int label; //positive
-    private int profileId = 0;
     private final List<Feature> features;
     private final Integer extraInfo;
-    private List<Integer> profileIds = null;
+    
+    private int profileId = 0;
+    private List<Integer> profileIds = new LinkedList<Integer>();
 
     public Line4RankLib(int profileId, int label, List<Feature> features, Integer extraInfo) {
         this.label = label;
@@ -32,6 +34,31 @@ public class Line4RankLib {
         this.extraInfo = extraInfo;
         this.profileIds = profileIds;
     }
+
+    public int getLabel() {
+        return label;
+    }
+
+    public void setLabel(int label) {
+        this.label = label;
+    }
+
+    public int getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(int profileId) {
+        this.profileId = profileId;
+    }
+
+    public List<Integer> getProfileIds() {
+        return profileIds;
+    }
+
+    public void setProfileIds(List<Integer> profileIds) {
+        this.profileIds = profileIds;
+    }
+    
 
     @Override
     public String toString() {
