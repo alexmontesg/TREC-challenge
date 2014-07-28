@@ -107,3 +107,31 @@ OLAD DATA INFILE '/home/data/trec_challenge/classification/mallet-2.0.7/classifi
 create table descriptionSentiment (Attraction_Id int, Desc_sentiment_score DOUBLE);
 LOAD DATA INFILE '/home/data/trec_challenge/sentiment/senti_venues.txt' INTO TABLE 
 descriptionSentiment  COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
+
+
+Create Table score_net (place_id INT, profile_id INT, score DOUBLE);
+Create Table score_rfores (place_id INT, profile_id INT, score DOUBLE);
+Create Table score_lambda (place_id INT, profile_id INT, score DOUBLE);
+
+
+LOAD DATA INFILE '/home/data/trec_challenge/RankLibInputs/output_Net.txt' 
+INTO TABLE score_net COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
+
+LOAD DATA INFILE '/home/data/trec_challenge/RankLibInputs/output_RForest.txt' 
+INTO TABLE score_rforest COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
+
+LOAD DATA INFILE '/home/data/trec_challenge/RankLibInputs/output_Lambda.txt' 
+INTO TABLE score_lambda COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
+
+CREATE TABLE result_net AS SELECT t2.place_id, t2.profile_id, t1.context_id, t1.name as title, 
+t1.description, t1.url, t2.score FROM venues t1 INNER JOIN score_net t2 ON t2.place_id = t1.id
+order by profile_id;
+
+CREATE TABLE result_rforest AS SELECT t2.place_id, t2.profile_id, t1.context_id, t1.name as title, 
+t1.description, t1.url, t2.score FROM venues t1 INNER JOIN score_rforest t2 ON t2.place_id = t1.id
+order by profile_id;
+
+
+CREATE TABLE result_lambda AS SELECT t2.place_id, t2.profile_id, t1.context_id, t1.name as title, 
+t1.description, t1.url, t2.score FROM venues t1 INNER JOIN score_lambda t2 ON t2.place_id = t1.id
+order by profile_id;

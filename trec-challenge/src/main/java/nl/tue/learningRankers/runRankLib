@@ -1,0 +1,12 @@
+
+#TRAIN
+
+#List-wise optimize P@5
+java -jar bin/RankLib.jar -ranker 5 -train /home/data/trec_challenge/RankLibInputs/rankLib_train.lst -metric2t P@5 -save model_without_Lambda.txt -kcv 5 >err_without_rankLambda.txt
+java -jar bin/RankLib.jar -ranker 7 -train /home/data/trec_challenge/RankLibInputs/rankLib_train.lst -metric2t P@5 -save model_Net.txt
+java -jar bin/RankLib.jar -ranker 8 -train /home/data/trec_challenge/RankLibInputs/rankLib_train.lst -metric2t P@5 -save model_RForest.txt
+
+#TEST
+
+nohup java -jar bin/RankLib.jar -load model_Net.txt -rank /home/data/trec_challenge/RankLibInputs/rankLib_rank.lst -score score_Net.txt &
+nohup java -jar bin/RankLib.jar -load model_RForest.txt -rank /home/data/trec_challenge/RankLibInputs/rankLib_rank.lst -score score_RForest.txt &

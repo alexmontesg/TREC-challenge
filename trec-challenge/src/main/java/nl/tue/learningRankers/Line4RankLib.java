@@ -16,7 +16,7 @@ public class Line4RankLib {
 
     private int label; //positive
     private final List<Feature> features;
-    private final Integer extraInfo;
+    private final Integer placeId;
     
     private int profileId = 0;
     private List<Integer> profileIds = new LinkedList<Integer>();
@@ -25,13 +25,13 @@ public class Line4RankLib {
         this.label = label;
         this.profileId = profileId;
         this.features = features;
-        this.extraInfo = extraInfo;
+        this.placeId = extraInfo;
     }
 
     public Line4RankLib(final List<Integer> profileIds, int label, List<Feature> features, Integer extraInfo) {
         this.label = label;
         this.features = features;
-        this.extraInfo = extraInfo;
+        this.placeId = extraInfo;
         this.profileIds = profileIds;
     }
 
@@ -80,8 +80,8 @@ public class Line4RankLib {
         for (Feature feature : features) {
             str.append(" ").append(feature.toString());
         }
-        if (this.extraInfo != null) {
-            str.append(" ").append("# ").append(extraInfo);
+        if (this.placeId != null) {
+            str.append(" ").append("# ").append(placeId);
         }
         str.append("\n");
     }
