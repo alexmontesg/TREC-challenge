@@ -82,7 +82,7 @@ public class TrecResult {
     @Override
     public String toString() {
         return   this.groupId + "," + runid + "," + profileId + "," + context + "," + rank + 
-                ", \"" + title + "\",\"" + desc + "\", " + url;
+                ",\"" + title + "\",\"" + desc + "\"," + url +",\n";
     }
     
     

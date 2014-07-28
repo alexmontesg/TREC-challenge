@@ -26,6 +26,7 @@ public class PrinterTrecResult {
         Writer writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[2]), "utf-8"));
+            writer.write("groupid,runid,profile,context,rank,title,description,url,docId\n");
             for (TrecResult line : listRes) {
                 writer.write(line.toString());
             }
