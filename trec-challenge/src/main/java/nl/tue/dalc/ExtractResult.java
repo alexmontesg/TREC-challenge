@@ -4,12 +4,15 @@
  */
 package nl.tue.dalc;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 import nl.tue.learningRankers.TrecResult;
+import org.apache.commons.validator.routines.UrlValidator;
 
 /**
  *
@@ -26,18 +29,22 @@ public class ExtractResult extends BaseDalc {
     public ExtractResult() throws ClassNotFoundException,
             InstantiationException, IllegalAccessException, SQLException {
         super(
-                "jdbc:mysql://131.155.69.14:3306/trec_ca_2014?user=admin&password=12dsa67kl>!");
+                "jdbc:mysql://131.155.69.14:3306/trec_ca_2014?useUnicode=true&characterEncoding=UTF-8&"
+                + "user=admin&password=12dsa67kl>!");
     }
 
-    public List<TrecResult> getResult(String tableName, String runid) {
+    public List<TrecResult> getResult(String tableName, String runid) throws UnsupportedEncodingException {
         return extracResults(tableName, runid);
     }
 
-    //CREATE TABLE result_rforest AS SELECT t2.place_id, t2.profile_id, t1.context_id, t1.name as title, 
+ //CREATE TABLE result_rforest AS SELECT t2.place_id, t2.profile_id, t1.context_id, t1.name as title, 
 //t1.description, t1.url, t2.score FROM venues t1 INNER JOIN score_rforest t2 ON t2.place_id = t1.id
 //order by profile_id;
-    private List<TrecResult> extracResults(String tableName, String runid) {
+    
+    private List<TrecResult> extracResults(String tableName, String runid) throws UnsupportedEncodingException {
         final List<TrecResult> results = new LinkedList<TrecResult>();
+        String[] schemes = {"http", "https"};
+        UrlValidator urlValidator = new UrlValidator(schemes);
         List<Integer> profileIds;
         List<Integer> contextIds;
         try {
@@ -51,41 +58,75 @@ public class ExtractResult extends BaseDalc {
                 statementDistinctContext = conn.createStatement();
             }
             profileIds = getListProfileIds();
+            System.err.println(profileIds.toString());
             contextIds = getListContextIds();
+            System.err.println(contextIds.toString());
             for (Integer profileId : profileIds) {
                 for (Integer contextId : contextIds) {
                     int currentRank = 1;
                     final String query = "SELECT * FROM " + tableName + " WHERE profile_id = " + profileId
-                            + " AND context_id = " + contextId + " order by score desc limit 50";
+                            + " AND context_id = " + contextId + " order by score desc limit 100";
                     statementResult.execute(query);
+                    //System.err.println(query);
                     final ResultSet resultSet = statementResult.getResultSet();
+                    List<String> usedUrls = new LinkedList<String>();
                     while (resultSet.next()) {
                         if (currentRank > NUMBER_OF_RESULTS) {
+                            break;
+                        }
+                        final Double score = Double.valueOf(resultSet.getString("score"));
+                        //System.err.println("score "+ score);
+                        if(score == 0.0 && currentRank > 5){
                             break;
                         }
                         final String url = resultSet.getString("url");
                         if (url == null) {
                             continue;
-                        } else {
-                            final Integer profilId = Integer.valueOf(resultSet.getString("profile_id"));
-                            String title = resultSet.getString("title");
-                            if (title.length() > 64) {
-                                title = title.substring(0, 64);
-                            }
-                            String desc = resultSet.getString("description");
-                            if (desc == null) {
-                                desc = title;
-                            } else {
-                                desc = processDesc(desc);
-                            }
-                            if (desc.length() > 512) {
-                                desc = desc.substring(0, 512);
-                            }
-                            final TrecResult trRes = new TrecResult(runid, profilId, contextId, currentRank, title, desc, url);
-                            results.add(trRes);
-                            currentRank++;
                         }
+                        if (!urlValidator.isValid(url)) {
+                            continue;
+                        }
+                        if (usedUrls.contains(url)) {
+                            continue;
+                        }
+                        String title = resultSet.getString("title");
+                        if (title == null) {
+                            continue;
+                        }
+                             byte[] titleBytes = title.getBytes();
+                        title = new String(titleBytes,"UTF-8");
+                        if (title.length() > 64) {
+                            title = title.substring(0, 64);
+                        }
+                        title = title.replaceAll("\"", "\'");
+                        final Integer profilId = Integer.valueOf(resultSet.getString("profile_id"));
+                        String desc = resultSet.getString("description");
+                        if (desc == null) {
+                            desc = title;
+                        } else {
+                            desc = processDesc(desc).replaceAll("\"", "\'");
+                        }
+                        byte[] descBytes = desc.getBytes();
+                        desc = new String(descBytes,"UTF-8");
+                        if(desc.contains("??")){
+                            continue;
+                        }
+                        if(desc.contains("?")){
+                            desc = desc.replaceAll("\\?", "\'");
+                        }
+                        
+                        if (desc.length() > 512) {
+                            //System.err.println("BEFORE "+desc.length());
+                            desc = desc.substring(0, 512);
+                            //System.err.println("AFTER "+desc.length());
+                            
+                        }
+                        usedUrls.add(url);
+                        final TrecResult trRes = new TrecResult(runid, profilId, contextId, currentRank, title, desc, url);
+                        results.add(trRes);
+                        currentRank++;
                     }
+
                 }
             }
             statementResult.close();

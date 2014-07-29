@@ -8,6 +8,7 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.util.List;
@@ -19,7 +20,7 @@ import nl.tue.dalc.ExtractResult;
  */
 public class PrinterTrecResult {
 
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException, UnsupportedEncodingException {
 
         ExtractResult res = new ExtractResult();
         List<TrecResult> listRes = res.getResult(args[0], args[1]);
