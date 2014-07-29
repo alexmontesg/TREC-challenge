@@ -24,6 +24,9 @@ public class ExtractResult extends BaseDalc {
     private Statement statementResult;
     private Statement statementDistinctContext;
     private static final int NUMBER_OF_RESULTS = 50;
+    
+    private String more;
+    private String less;
     private String descSeparator = "ALBERT HEIJN";
 
     public ExtractResult() throws ClassNotFoundException,
@@ -33,7 +36,9 @@ public class ExtractResult extends BaseDalc {
                 + "user=admin&password=12dsa67kl>!");
     }
 
-    public List<TrecResult> getResult(String tableName, String runid) throws UnsupportedEncodingException {
+    public List<TrecResult> getResult(String tableName, String runid, String more, String less) throws UnsupportedEncodingException {
+        this.more = more;
+        this.less = less;
         return extracResults(tableName, runid);
     }
 
@@ -67,7 +72,7 @@ public class ExtractResult extends BaseDalc {
                     final String query = "SELECT * FROM " + tableName + " WHERE profile_id = " + profileId
                             + " AND context_id = " + contextId + " order by score desc limit 100";
                     statementResult.execute(query);
-                    //System.err.println(query);
+                    System.err.println(query);
                     final ResultSet resultSet = statementResult.getResultSet();
                     List<String> usedUrls = new LinkedList<String>();
                     while (resultSet.next()) {
@@ -153,11 +158,11 @@ public class ExtractResult extends BaseDalc {
         } else {
             return desc;
         }
-
     }
 
     private List<Integer> getListProfileIds() {
-        String query = "select distinct Profile_Id from profiles;"; //
+        String query = "select distinct Profile_Id from profiles WHERE Profile_Id >"+more+" AND Profile_Id < "+less+";"; //
+        System.err.println(query);
         final List<Integer> profiles = new LinkedList<Integer>();
         System.err.println(query);
         try {

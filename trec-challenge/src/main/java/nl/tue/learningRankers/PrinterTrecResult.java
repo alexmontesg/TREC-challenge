@@ -23,7 +23,7 @@ public class PrinterTrecResult {
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException, UnsupportedEncodingException {
 
         ExtractResult res = new ExtractResult();
-        List<TrecResult> listRes = res.getResult(args[0], args[1]);
+        List<TrecResult> listRes = res.getResult(args[0], args[1], args[3], args[4]);
         Writer writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[2]), "utf-8"));
